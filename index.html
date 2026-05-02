@@ -5,6 +5,18 @@
 <html lang="zh-Hant">
   <head>
     <meta charset="utf-8" />
+    <script>
+      (function() {
+        var base = window.location.pathname.replace(/\/[^\/]*$/, '');
+        var origFetch = window.fetch;
+        window.fetch = function(url) {
+          if (typeof url === 'string' && url.charAt(0) === '/' && url.charAt(1) !== '/') {
+            url = base + url;
+          }
+          return origFetch.apply(this, arguments);
+        };
+      })();
+    </script>
     <noscript>
       <style>
         #container {
