@@ -1,0 +1,10 @@
+<?xml version="1.0" encoding="utf-8"?>
+<svg xmlns="http://www.w3.org/2000/svg" fill="none" height="100%" overflow="visible" preserveAspectRatio="none" style="display: block;" viewBox="0 0 24 24" width="100%">
+<g id="Substack">
+<g id="Union">
+<path d="M20 21.2856L12.3125 17.1235L4.625 21.2856V12.5004H20V21.2856Z" fill="var(--fill-0, #F1EFEA)" fill-opacity="0.8"/>
+<path d="M20 10.3032H4.625V8.10686H20V10.3032Z" fill="var(--fill-0, #F1EFEA)" fill-opacity="0.8"/>
+<path d="M20 5.91057H4.625V3.71429H20V5.91057Z" fill="var(--fill-0, #F1EFEA)" fill-opacity="0.8"/>
+</g>
+</g>
+</svg>
