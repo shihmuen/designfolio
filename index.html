@@ -7,7 +7,8 @@
     <meta charset="utf-8" />
     <script>
       (function() {
-        var base = window.location.pathname.replace(/\/[^\/]*$/, '');
+        if (!window.location.hostname.endsWith('.github.io')) return;
+        var base = '/' + window.location.pathname.split('/').filter(Boolean)[0];
         var origFetch = window.fetch;
         window.fetch = function(url) {
           if (typeof url === 'string' && url.charAt(0) === '/' && url.charAt(1) !== '/') {
