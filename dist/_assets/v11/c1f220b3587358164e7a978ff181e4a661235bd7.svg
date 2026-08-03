@@ -1,0 +1,14 @@
+<?xml version="1.0" encoding="utf-8"?>
+<svg xmlns="http://www.w3.org/2000/svg" fill="none" height="100%" overflow="visible" preserveAspectRatio="none" style="display: block;" viewBox="0 0 22 36" width="100%">
+<g clip-path="url(#clip0_0_1174)" id="music.note 1">
+<g id="Group">
+<path d="M22 0H0V36H22V0Z" fill="var(--fill-0, black)" id="Vector" opacity="0"/>
+<path d="M21.4829 8.756V2.19931C21.4829 1.31959 20.77 0.742268 19.8895 0.920961L10.8602 2.8591C9.79796 3.07903 9.2249 3.65636 9.2249 4.57731L9.26683 24.1237C9.35069 25.0447 8.88945 25.6632 8.06481 25.8281L5.19949 26.4192C1.66328 27.1339 0 28.8797 0 31.5189C0 34.1581 2.05464 36 4.98984 36C7.60355 36 11.4612 34.1305 11.4612 29.0583V13.0034C11.4612 12.0137 11.6709 11.7801 12.5934 11.5739L20.5743 9.85565C21.1334 9.73194 21.4829 9.31957 21.4829 8.756Z" fill="var(--fill-0, #CE3C54)" id="Vector_2"/>
+</g>
+</g>
+<defs>
+<clipPath id="clip0_0_1174">
+<rect fill="white" height="36" width="22"/>
+</clipPath>
+</defs>
+</svg>

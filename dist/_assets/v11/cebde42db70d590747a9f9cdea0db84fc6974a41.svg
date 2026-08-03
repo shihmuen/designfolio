@@ -1,0 +1,10 @@
+<?xml version="1.0" encoding="utf-8"?>
+<svg xmlns="http://www.w3.org/2000/svg" fill="none" height="100%" overflow="visible" preserveAspectRatio="none" style="display: block;" viewBox="0 0 48 28.5" width="100%">
+<g id="Nav">
+<g id="Union">
+<path d="M47.2725 27C47.6741 27 48 27.3358 48 27.75C48 28.1642 47.6741 28.5 47.2725 28.5H0.727539C0.325877 28.5 0 28.1642 0 27.75C0 27.3358 0.325877 27 0.727539 27H47.2725Z" fill="var(--fill-0, black)" fill-opacity="0.8"/>
+<path d="M47.2725 13.5C47.6741 13.5 48 13.8358 48 14.25C48 14.6642 47.6741 15 47.2725 15H0.727539C0.325877 15 0 14.6642 0 14.25C0 13.8358 0.325877 13.5 0.727539 13.5H47.2725Z" fill="var(--fill-0, black)" fill-opacity="0.8"/>
+<path d="M47.2725 0C47.6741 0 48 0.335786 48 0.75C48 1.16421 47.6741 1.5 47.2725 1.5H0.727539C0.325877 1.5 0 1.16421 0 0.75C0 0.335786 0.325877 0 0.727539 0H47.2725Z" fill="var(--fill-0, black)" fill-opacity="0.8"/>
+</g>
+</g>
+</svg>

@@ -1,0 +1,142 @@
+<!-- lang-toggle: injected by mirror.mjs -->
+<script>
+(function () {
+  // Language is decided by the molly-lang cookie; Vercel rewrites serve /zh/* or /en/*
+  // while the visible URL stays clean (/, /works …) so the Figma runtime — which keys
+  // its hydration and animations off location.pathname — behaves exactly like the
+  // original site.
+  var PAGE_LANG = document.documentElement.getAttribute('data-molly-lang') || 'zh';
+
+  function setCookie(l) {
+    document.cookie = 'molly-lang=' + l + '; path=/; max-age=31536000; SameSite=Lax';
+  }
+
+  // Self-heal: a direct visit to a prefixed URL (/zh/works, /en/about-me) bypasses the
+  // rewrite. Remember that language, then reload on the clean URL.
+  var m = location.pathname.match(/^\/(zh|en)(\/.*)?$/);
+  if (m) {
+    setCookie(m[1]);
+    location.replace((m[2] && m[2] !== '/' ? m[2] : '/') + location.search + location.hash);
+    return;
+  }
+
+  function switchTo(target) {
+    if (target === PAGE_LANG) return;
+    setCookie(target);
+    location.reload();
+  }
+
+  var box = null;
+  var mode = null; // 'header' | 'fixed'
+  // segmented pill control (styled after the My Secret Playlist toggle):
+  // grey capsule track, active segment raised white with a soft shadow.
+  function build() {
+    box = document.createElement('div');
+    box.id = 'molly-lang-toggle';
+    box.setAttribute('role', 'group');
+    box.setAttribute('aria-label', 'Language');
+    box.style.cssText = 'display:inline-flex;align-items:center;background:rgba(0,0,0,.07);' +
+      'border-radius:999px;padding:3px;white-space:nowrap;user-select:none;';
+    [['zh', '中文'], ['en', 'EN']].forEach(function (pair) {
+      var b = document.createElement('button');
+      b.type = 'button';
+      b.textContent = pair[1];
+      b.setAttribute('aria-label', pair[0] === 'zh' ? '中文版' : 'English');
+      var active = pair[0] === PAGE_LANG;
+      b.style.cssText = 'all:unset;box-sizing:border-box;cursor:' + (active ? 'default' : 'pointer') +
+        ';font-family:inherit;font-size:15px;line-height:1;letter-spacing:.02em;' +
+        'padding:8px 18px;border-radius:999px;text-align:center;' +
+        'font-weight:' + (active ? '700' : '500') + ';color:' + (active ? '#111' : 'rgba(0,0,0,.40)') + ';' +
+        (active ? 'background:#fff;box-shadow:0 1px 4px rgba(0,0,0,.14);' : 'background:transparent;');
+      if (!active) {
+        b.addEventListener('mouseenter', function () { b.style.color = '#111'; });
+        b.addEventListener('mouseleave', function () { b.style.color = 'rgba(0,0,0,.40)'; });
+      }
+      b.addEventListener('click', function () { switchTo(pair[0]); });
+      box.appendChild(b);
+    });
+    return box;
+  }
+
+  // Preferred home: inside the site header, just left of its rightmost control
+  // (hamburger on normal pages, close button on /nav) so the toggle scrolls and
+  // animates with the navigation bar. Hydration can momentarily blank the header,
+  // so if we ever fall back to a fixed position, keep watching and move into the
+  // header as soon as it is usable again.
+  function headerTarget() {
+    var header = document.querySelector('header');
+    if (!header) return null;
+    // normal pages: the hamburger is the a[href="/nav"] that wraps the icon —
+    // identify it by structure, not by width (the icon image may not have
+    // loaded yet, which would make it measure 0 and get skipped).
+    var links = header.querySelectorAll('a');
+    for (var i = 0; i < links.length; i++) {
+      var href = links[i].getAttribute('href') || '';
+      if (/\/nav$/.test(href) && links[i].querySelector('img,svg,nav')) return links[i];
+    }
+    // /nav page: no hamburger; use the rightmost visible header control
+    // (the close button) — only trust it once it sits in the right half.
+    var best = null;
+    for (var j = 0; j < links.length; j++) {
+      var r = links[j].getBoundingClientRect();
+      if (r.width > 0 && r.left > window.innerWidth * 0.5 && (!best || r.left > best.getBoundingClientRect().left)) best = links[j];
+    }
+    return best;
+  }
+
+  function mountHeader(target) {
+    box.style.position = '';
+    box.style.top = '';
+    box.style.right = '';
+    box.style.zIndex = '';
+    box.style.marginLeft = 'auto'; // parent row is space-between: push right, beside the hamburger
+    box.style.marginRight = '26px';
+    target.parentElement.insertBefore(box, target);
+    mode = 'header';
+  }
+
+  function mountFixed() {
+    box.style.marginRight = '';
+    box.style.position = 'fixed';
+    box.style.top = '30px';
+    box.style.right = '120px';
+    box.style.zIndex = '2147483647';
+    document.body.appendChild(box);
+    mode = 'fixed';
+  }
+
+  function mount() {
+    if (!box) build();
+    var target = headerTarget();
+    if (target) {
+      if (mode !== 'header' || !box.isConnected) mountHeader(target);
+    } else if (!box.isConnected) {
+      mountFixed();
+    }
+  }
+
+  var scheduled = false;
+  function scheduleMount() {
+    if (scheduled) return;
+    scheduled = true;
+    setTimeout(function () {
+      scheduled = false;
+      // re-mount when detached, or upgrade fixed → header once the header is back
+      if (!box || !box.isConnected || mode === 'fixed') mount();
+    }, 120);
+  }
+
+  function boot() {
+    mount();
+    new MutationObserver(scheduleMount).observe(document.documentElement, { childList: true, subtree: true });
+    // image loads don't mutate the DOM — recheck a few times so a fixed-mode
+    // fallback can still move into the header once its controls are measurable
+    [400, 1200, 2500, 5000].forEach(function (t) {
+      setTimeout(function () { if (!box || !box.isConnected || mode === 'fixed') mount(); }, t);
+    });
+  }
+  if (document.readyState === 'loading') {
+    document.addEventListener('DOMContentLoaded', boot);
+  } else { boot(); }
+})();
+</script>

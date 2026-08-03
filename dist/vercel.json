@@ -1,0 +1,34 @@
+{
+  "rewrites": [
+    {
+      "source": "/",
+      "has": [
+        {
+          "type": "cookie",
+          "key": "molly-lang",
+          "value": "en"
+        }
+      ],
+      "destination": "/en/index.html"
+    },
+    {
+      "source": "/",
+      "destination": "/zh/index.html"
+    },
+    {
+      "source": "/:path*",
+      "has": [
+        {
+          "type": "cookie",
+          "key": "molly-lang",
+          "value": "en"
+        }
+      ],
+      "destination": "/en/:path*"
+    },
+    {
+      "source": "/:path*",
+      "destination": "/zh/:path*"
+    }
+  ]
+}

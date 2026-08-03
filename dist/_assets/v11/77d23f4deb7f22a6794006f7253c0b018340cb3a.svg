@@ -1,0 +1,8 @@
+<?xml version="1.0" encoding="utf-8"?>
+<svg xmlns="http://www.w3.org/2000/svg" fill="none" height="100%" overflow="visible" preserveAspectRatio="none" style="display: block;" viewBox="0 0 36.5 7.5" width="100%">
+<g id="Vector">
+<path d="M7.5 3.75C7.5 5.82107 5.82107 7.5 3.75 7.5C1.67893 7.5 0 5.82107 0 3.75C0 1.67893 1.67893 0 3.75 0C5.82107 0 7.5 1.67893 7.5 3.75Z" fill="var(--fill-0, black)" fill-opacity="0.2"/>
+<path d="M22 3.75C22 5.82107 20.3211 7.5 18.25 7.5C16.1789 7.5 14.5 5.82107 14.5 3.75C14.5 1.67893 16.1789 0 18.25 0C20.3211 0 22 1.67893 22 3.75Z" fill="var(--fill-0, black)" fill-opacity="0.2"/>
+<path d="M36.5 3.75C36.5 5.82107 34.8211 7.5 32.75 7.5C30.6789 7.5 29 5.82107 29 3.75C29 1.67893 30.6789 0 32.75 0C34.8211 0 36.5 1.67893 36.5 3.75Z" fill="var(--fill-0, black)" fill-opacity="0.2"/>
+</g>
+</svg>
