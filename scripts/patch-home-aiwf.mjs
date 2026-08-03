@@ -5,7 +5,9 @@
 // 目前只套用中文版（dist/zh/index.html）；英文版待 Molly 確認後另加。
 import { readFile, writeFile } from 'node:fs/promises';
 
-const FILE = new URL('../dist/zh/index.html', import.meta.url).pathname;
+// 注入所有 zh 頁面：站內換頁是 SPA（不重載 HTML），監聽器必須從任何入口頁就開始跑
+const PAGES = ['', 'nav', 'about-me', 'works', 'pomo-ecosystem', 'nfc-claming', 'clovis-mvp', 'token-generate-event', 'memory-gallery'];
+const FILES = PAGES.map((p) => new URL(`../dist/zh/${p ? p + '/' : ''}index.html`, import.meta.url).pathname);
 const MARKER = 'molly-home-aiwf-patch';
 
 const SNIPPET = `<script id="${MARKER}">
@@ -158,6 +160,9 @@ const SNIPPET = `<script id="${MARKER}">
   }
 
   function mount() {
+    // 補丁注入在所有頁面（SPA 換頁不會重新執行各頁的 script），
+    // 只在首頁網址下動作
+    if (!/^\\/(zh\\/?)?$/.test(location.pathname)) return;
     if (document.getElementById(SECTION_ID)) return;
     var parts = findParts();
     if (!parts) return;
@@ -176,19 +181,29 @@ const SNIPPET = `<script id="${MARKER}">
     mount();
     new MutationObserver(scheduleMount).observe(document.documentElement, { childList: true, subtree: true });
     [500, 1500, 3000, 5000].forEach(function (t) { setTimeout(mount, t); });
+    // SPA 轉場會把整棵 DOM 換掉，掛在舊樹上的 MutationObserver 會靜默死亡；
+    // setInterval 掛在 window 上不受影響，當常駐心跳補掛。
+    setInterval(function () { try { mount(); } catch (e) {} }, 700);
   }
   if (document.readyState === 'loading') document.addEventListener('DOMContentLoaded', boot);
   else boot();
 })();
 </script>`;
 
-let html = await readFile(FILE, 'utf8');
-const existing = new RegExp('<script id="' + MARKER + '">[\\s\\S]*?</' + 'script>');
-if (existing.test(html)) {
-  html = html.replace(existing, SNIPPET);
-  console.log('replaced existing home AI Workflow patch');
-} else {
-  html = html.replace('</head>', SNIPPET + '\n</head>');
-  console.log('patched zh/index.html with AI Workflow section');
+
+// 守門：輸出前驗證 snippet 語法，壞版本直接中止（見 memory: poc-verify-cache-and-syntax）
+{
+  const inner = SNIPPET.replace(/^<script[^>]*>/, '').replace(/<\/script>$/, '');
+  new Function(inner); // SyntaxError 會直接 throw、退出非零
 }
-await writeFile(FILE, html);
+const existing = new RegExp('<script id="' + MARKER + '">[\\s\\S]*?</' + 'script>');
+for (const file of FILES) {
+  let html = await readFile(file, 'utf8');
+  if (existing.test(html)) {
+    html = html.replace(existing, SNIPPET);
+  } else {
+    html = html.replace('</head>', SNIPPET + '\n</head>');
+  }
+  await writeFile(file, html);
+}
+console.log(`home AI Workflow patch applied to ${FILES.length} zh pages`);
