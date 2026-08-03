@@ -133,6 +133,17 @@ const SNIPPET = `<script id="${MARKER}">
         break;
       }
     }
+    // 設計哲學金句也住在同一個區塊容器裡，但不屬於 AI Workflow 區塊（設計稿只有標題＋卡片）
+    var els2 = clone.querySelectorAll('*');
+    for (var q = els2.length - 1; q >= 0; q--) {
+      var qt = txt(els2[q]);
+      if (qt.indexOf('對我來說') === 0) {
+        var qbox = els2[q];
+        while (qbox.parentElement && qbox.parentElement !== clone && txt(qbox.parentElement) === qt) qbox = qbox.parentElement;
+        qbox.parentNode && qbox.parentNode.removeChild(qbox);
+        break;
+      }
+    }
     // 清進場動畫殘留（clone 不受 runtime 動畫接管）
     var all = [clone].concat(Array.prototype.slice.call(clone.querySelectorAll('*')));
     for (var s2 = 0; s2 < all.length; s2++) {
