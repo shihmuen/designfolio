@@ -1,0 +1,258 @@
+<!DOCTYPE html>
+<html data-molly-lang="en" lang="zh-Hant">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>MollyShih.designfolio－My AI Workflow</title>
+<link rel="icon" href="/_assets/v11/9eb4a1a62147d8d0785f011f75758e4fe40bf6fb.png">
+<!-- lang-toggle: injected by mirror.mjs -->
+<script>
+(function () {
+  // Language is decided by the molly-lang cookie; Vercel rewrites serve /zh/* or /en/*
+  // while the visible URL stays clean (/, /works …) so the Figma runtime — which keys
+  // its hydration and animations off location.pathname — behaves exactly like the
+  // original site.
+  var PAGE_LANG = document.documentElement.getAttribute('data-molly-lang') || 'zh';
+
+  function setCookie(l) {
+    document.cookie = 'molly-lang=' + l + '; path=/; max-age=31536000; SameSite=Lax';
+  }
+
+  // Self-heal: a direct visit to a prefixed URL (/zh/works, /en/about-me) bypasses the
+  // rewrite. Remember that language, then reload on the clean URL.
+  var m = location.pathname.match(/^\/(zh|en)(\/.*)?$/);
+  if (m) {
+    setCookie(m[1]);
+    location.replace((m[2] && m[2] !== '/' ? m[2] : '/') + location.search + location.hash);
+    return;
+  }
+
+  function switchTo(target) {
+    if (target === PAGE_LANG) return;
+    setCookie(target);
+    location.reload();
+  }
+
+  var box = null;
+  var mode = null; // 'header' | 'fixed'
+  // segmented pill control (styled after the My Secret Playlist toggle):
+  // grey capsule track, active segment raised white with a soft shadow.
+  function build() {
+    box = document.createElement('div');
+    box.id = 'molly-lang-toggle';
+    box.setAttribute('role', 'group');
+    box.setAttribute('aria-label', 'Language');
+    box.style.cssText = 'display:inline-flex;align-items:center;background:rgba(0,0,0,.07);' +
+      'border-radius:999px;padding:3px;white-space:nowrap;user-select:none;';
+    [['zh', '中文'], ['en', 'EN']].forEach(function (pair) {
+      var b = document.createElement('button');
+      b.type = 'button';
+      b.textContent = pair[1];
+      b.setAttribute('aria-label', pair[0] === 'zh' ? '中文版' : 'English');
+      var active = pair[0] === PAGE_LANG;
+      b.style.cssText = 'all:unset;box-sizing:border-box;cursor:' + (active ? 'default' : 'pointer') +
+        ';font-family:inherit;font-size:15px;line-height:1;letter-spacing:.02em;' +
+        'padding:8px 18px;border-radius:999px;text-align:center;' +
+        'font-weight:' + (active ? '700' : '500') + ';color:' + (active ? '#111' : 'rgba(0,0,0,.40)') + ';' +
+        (active ? 'background:#fff;box-shadow:0 1px 4px rgba(0,0,0,.14);' : 'background:transparent;');
+      if (!active) {
+        b.addEventListener('mouseenter', function () { b.style.color = '#111'; });
+        b.addEventListener('mouseleave', function () { b.style.color = 'rgba(0,0,0,.40)'; });
+      }
+      b.addEventListener('click', function () { switchTo(pair[0]); });
+      box.appendChild(b);
+    });
+    return box;
+  }
+
+  // Preferred home: inside the site header, just left of its rightmost control
+  // (hamburger on normal pages, close button on /nav) so the toggle scrolls and
+  // animates with the navigation bar. Hydration can momentarily blank the header,
+  // so if we ever fall back to a fixed position, keep watching and move into the
+  // header as soon as it is usable again.
+  function headerTarget() {
+    var header = document.querySelector('header');
+    if (!header) return null;
+    // normal pages: the hamburger is the a[href="/nav"] that wraps the icon —
+    // identify it by structure, not by width (the icon image may not have
+    // loaded yet, which would make it measure 0 and get skipped).
+    var links = header.querySelectorAll('a');
+    for (var i = 0; i < links.length; i++) {
+      var href = links[i].getAttribute('href') || '';
+      if (/\/nav$/.test(href) && links[i].querySelector('img,svg,nav')) return links[i];
+    }
+    // /nav page: no hamburger; use the rightmost visible header control
+    // (the close button) — only trust it once it sits in the right half.
+    var best = null;
+    for (var j = 0; j < links.length; j++) {
+      var r = links[j].getBoundingClientRect();
+      if (r.width > 0 && r.left > window.innerWidth * 0.5 && (!best || r.left > best.getBoundingClientRect().left)) best = links[j];
+    }
+    return best;
+  }
+
+  function mountHeader(target) {
+    box.style.position = '';
+    box.style.top = '';
+    box.style.right = '';
+    box.style.zIndex = '';
+    box.style.marginLeft = 'auto'; // parent row is space-between: push right, beside the hamburger
+    box.style.marginRight = '26px';
+    target.parentElement.insertBefore(box, target);
+    mode = 'header';
+  }
+
+  function mountFixed() {
+    box.style.marginRight = '';
+    box.style.position = 'fixed';
+    box.style.top = '30px';
+    box.style.right = '120px';
+    box.style.zIndex = '2147483647';
+    document.body.appendChild(box);
+    mode = 'fixed';
+  }
+
+  function mount() {
+    if (!box) build();
+    var target = headerTarget();
+    if (target) {
+      if (mode !== 'header' || !box.isConnected) mountHeader(target);
+    } else if (!box.isConnected) {
+      mountFixed();
+    }
+  }
+
+  var scheduled = false;
+  function scheduleMount() {
+    if (scheduled) return;
+    scheduled = true;
+    setTimeout(function () {
+      scheduled = false;
+      // re-mount when detached, or upgrade fixed → header once the header is back
+      if (!box || !box.isConnected || mode === 'fixed') mount();
+    }, 120);
+  }
+
+  function boot() {
+    mount();
+    new MutationObserver(scheduleMount).observe(document.documentElement, { childList: true, subtree: true });
+    // image loads don't mutate the DOM — recheck a few times so a fixed-mode
+    // fallback can still move into the header once its controls are measurable
+    [400, 1200, 2500, 5000].forEach(function (t) {
+      setTimeout(function () { if (!box || !box.isConnected || mode === 'fixed') mount(); }, t);
+    });
+  }
+  if (document.readyState === 'loading') {
+    document.addEventListener('DOMContentLoaded', boot);
+  } else { boot(); }
+})();
+</script>
+
+<style>
+  @font-face {
+    font-family: 'InterVF';
+    src: url('/_woff/v2/Inter_1/Inter_1.woff2') format('woff2');
+    font-weight: 100 900;
+    font-display: swap;
+  }
+  :root {
+    --bg: #F1EFEA;
+    --ink: #111111;
+    --ink-55: rgba(0,0,0,.55);
+    --hairline: rgba(0,0,0,.15);
+    --font: 'InterVF', Inter, -apple-system, 'PingFang TC', 'Noto Sans TC', sans-serif;
+  }
+  * { margin: 0; padding: 0; box-sizing: border-box; }
+  html, body { background: var(--bg); color: var(--ink); font-family: var(--font); }
+  a { color: inherit; text-decoration: none; }
+  img { display: block; }
+  .wrap { max-width: 1280px; margin: 0 auto; }
+
+  /* ===== Header（對齊站上原生 header：高 114、logo 左、漢堡右） ===== */
+  header.aiwf-header { height: 114px; }
+  header.aiwf-header .wrap {
+    height: 100%; display: flex; align-items: center; justify-content: space-between;
+    padding: 0 64px;
+  }
+  .aiwf-logo img { width: 55px; height: 66px; }
+  .aiwf-ham { display: flex; align-items: center; }
+  .aiwf-ham img { width: 60px; height: 37px; }
+
+  /* ===== Hero / Overview ===== */
+  .aiwf-hero .wrap {
+    display: flex; gap: 60px; align-items: stretch;
+    padding: 120px 64px 96px;
+  }
+  .aiwf-hero-title { flex: 1 0 0; min-width: 1px; display: flex; flex-direction: column; gap: 32px; }
+  .aiwf-hero-title h1 {
+    font-size: 44px; font-weight: 700; line-height: 1.2; letter-spacing: -0.02em; color: var(--ink);
+  }
+  .aiwf-hero-title p {
+    font-size: 18px; font-weight: 500; line-height: 1.45; letter-spacing: -0.005em; color: var(--ink-55);
+  }
+  .aiwf-hero-meta {
+    flex: 1 0 0; min-width: 1px; display: flex; flex-direction: column; gap: 24px;
+    justify-content: flex-end; padding-bottom: 12px;
+  }
+  .aiwf-hero-meta .row {
+    display: flex; align-items: center; justify-content: space-between;
+    padding-bottom: 24px; border-bottom: 1px solid var(--hairline);
+  }
+  .aiwf-hero-meta .label { font-size: 18px; font-weight: 500; line-height: 1.45; color: var(--ink-55); }
+  .aiwf-hero-meta .value { font-size: 28px; font-weight: 600; line-height: 1.2; letter-spacing: -0.02em; color: var(--ink); white-space: nowrap; }
+
+  /* ===== RWD ===== */
+  @media (max-width: 900px) {
+    header.aiwf-header .wrap { padding: 0 40px; }
+    .aiwf-hero .wrap { flex-direction: column; gap: 56px; padding: 72px 40px 64px; }
+    .aiwf-hero-meta { padding-bottom: 0; }
+  }
+  @media (max-width: 560px) {
+    header.aiwf-header { height: 90px; }
+    header.aiwf-header .wrap { padding: 0 24px; }
+    .aiwf-logo img { width: 44px; height: 53px; }
+    .aiwf-ham img { width: 48px; height: 30px; }
+    .aiwf-hero .wrap { gap: 40px; padding: 48px 24px 48px; }
+    .aiwf-hero-title h1 { font-size: 32px; }
+    .aiwf-hero-title p { font-size: 16px; }
+    .aiwf-hero-meta .row { padding-bottom: 16px; }
+    .aiwf-hero-meta .label { font-size: 15px; }
+    .aiwf-hero-meta .value { font-size: 20px; }
+  }
+</style>
+</head>
+<body>
+
+<header class="aiwf-header">
+  <div class="wrap">
+    <a class="aiwf-logo" href="/" aria-label="Home">
+      <img src="/_assets/v11/23520951ed400d2181c1b9229725081b18f5910c.png" alt="Molly Shih logo">
+    </a>
+    <a class="aiwf-ham" href="/nav" aria-label="Menu">
+      <img src="/_assets/v11/b90cf3bdcf9c0d30f7e1b43c26639fdba4a6c2e9.svg" alt="">
+    </a>
+  </div>
+</header>
+
+<main>
+  <!-- ===== Phase 1: Overview / 頁首 ===== -->
+  <section class="aiwf-hero">
+    <div class="wrap">
+      <div class="aiwf-hero-title">
+        <h1>設計我的 AI 協作系統</h1>
+        <p>沒有 coding 背景的我，用 UX 方法把 Claude 設計成協作系統。幫我打造 POC 對齊團隊、把討論轉成開發文件、依驗收標準執行設計稿。</p>
+      </div>
+      <div class="aiwf-hero-meta">
+        <div class="row"><span class="label">角色</span><span class="value">產品設計師</span></div>
+        <div class="row"><span class="label">團隊</span><span class="value">嗨科技股份有限公司</span></div>
+        <div class="row"><span class="label">時長</span><span class="value">2026 April - July</span></div>
+      </div>
+    </div>
+  </section>
+
+  <!-- ===== Phase 2+: 之後階段接續於此 ===== -->
+
+</main>
+
+</body>
+</html>
