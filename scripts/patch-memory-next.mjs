@@ -28,7 +28,14 @@ const SNIPPET = `<script id="${MARKER}">
 
   function findCardByMark() {
     var m = document.querySelector('[data-molly-next-seen="1"]');
-    return m || findNextCard();
+    var card = m || findNextCard();
+    if (!card) return null;
+    // 圖片常在文字容器的外層兄弟節點：往上爬到「含 img 且尚未包含 footer」的容器
+    while (!card.querySelector('img') && card.parentElement &&
+           (card.parentElement.textContent || '').indexOf('BACK TO TOP') === -1) {
+      card = card.parentElement;
+    }
+    return card.querySelector('img') ? card : (m || card);
   }
 
   function apply() {

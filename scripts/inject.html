@@ -1,4 +1,8 @@
 <!-- lang-toggle: injected by mirror.mjs -->
+<style id="molly-lang-toggle-style">
+  #molly-lang-toggle { position: absolute; right: 140px; top: 50%; transform: translateY(-50%); z-index: 10; }
+  @media (max-width: 640px) { #molly-lang-toggle { right: 84px; } }
+</style>
 <script>
 (function () {
   // Language is decided by the molly-lang cookie; Vercel rewrites serve /zh/* or /en/*
@@ -63,35 +67,17 @@
   // animates with the navigation bar. Hydration can momentarily blank the header,
   // so if we ever fall back to a fixed position, keep watching and move into the
   // header as soon as it is usable again.
-  function headerTarget() {
-    var header = document.querySelector('header');
-    if (!header) return null;
-    // normal pages: the hamburger is the a[href="/nav"] that wraps the icon —
-    // identify it by structure, not by width (the icon image may not have
-    // loaded yet, which would make it measure 0 and get skipped).
-    var links = header.querySelectorAll('a');
-    for (var i = 0; i < links.length; i++) {
-      var href = links[i].getAttribute('href') || '';
-      if (/\/nav$/.test(href) && links[i].querySelector('img,svg,nav')) return links[i];
-    }
-    // /nav page: no hamburger; use the rightmost visible header control
-    // (the close button) — only trust it once it sits in the right half.
-    var best = null;
-    for (var j = 0; j < links.length; j++) {
-      var r = links[j].getBoundingClientRect();
-      if (r.width > 0 && r.left > window.innerWidth * 0.5 && (!best || r.left > best.getBoundingClientRect().left)) best = links[j];
-    }
-    return best;
-  }
-
-  function mountHeader(target) {
+  // 固定座標掛載：直接 append 到 <header>，位置交給 #molly-lang-toggle 的 CSS
+  // （absolute right/top 置中）——每一頁的 header 內部排版不同也不會飄。
+  function mountHeader(header) {
+    if (getComputedStyle(header).position === 'static') header.style.position = 'relative';
     box.style.position = '';
     box.style.top = '';
     box.style.right = '';
     box.style.zIndex = '';
-    box.style.marginLeft = 'auto'; // parent row is space-between: push right, beside the hamburger
-    box.style.marginRight = '26px';
-    target.parentElement.insertBefore(box, target);
+    box.style.marginLeft = '';
+    box.style.marginRight = '';
+    header.appendChild(box);
     mode = 'header';
   }
 
@@ -107,9 +93,9 @@
 
   function mount() {
     if (!box) build();
-    var target = headerTarget();
-    if (target) {
-      if (mode !== 'header' || !box.isConnected) mountHeader(target);
+    var header = document.querySelector('header');
+    if (header) {
+      if (mode !== 'header' || !box.isConnected || box.parentElement !== header) mountHeader(header);
     } else if (!box.isConnected) {
       mountFixed();
     }
