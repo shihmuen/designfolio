@@ -152,3 +152,36 @@ console.log(`done. ${downloaded.size} assets total`);
   }
 }
 
+// 4. Videos: JSON 用 videoRef 引用，實體在 /_videos/v1/<hash>（無副檔名），
+// HTML 掃不到，要另掃 JSON 補抓（2026-07-06 memory-gallery demo 影片漏抓的教訓）。
+{
+  const { readdir } = await import('node:fs/promises');
+  const have = new Set();
+  try { for (const f of await readdir(path.join(ROOT, '_videos/v1'))) have.add(f); } catch {}
+  const refs = new Set();
+  async function scanDir(dir) {
+    for (const ent of await readdir(dir, { withFileTypes: true })) {
+      const p = path.join(dir, ent.name);
+      if (ent.isDirectory()) { await scanDir(p); continue; }
+      if (!ent.name.endsWith('.json')) continue;
+      const txt = await readFile(p, 'utf8').catch(() => '');
+      for (const m of txt.matchAll(/"videoRef":"([a-f0-9]{40})"/g)) refs.add(m[1]);
+    }
+  }
+  await scanDir(path.join(ROOT, '_json'));
+  const missing = [...refs].filter((h) => !have.has(h));
+  console.log(`videos: ${refs.size} refs, ${missing.length} missing`);
+  for (const h of missing) {
+    let got = false;
+    for (const origin of Object.values(SITES)) {
+      try {
+        const buf = await fetchBin(`${origin}/_videos/v1/${h}`);
+        await save(`_videos/v1/${h}`, buf);
+        console.log(`video ${h.slice(0, 10)} (${buf.length}b)`);
+        got = true; break;
+      } catch { /* try next origin */ }
+    }
+    if (!got) console.log(`video ${h.slice(0, 10)} not found — skipped`);
+  }
+}
+
