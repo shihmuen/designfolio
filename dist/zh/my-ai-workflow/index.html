@@ -304,6 +304,25 @@
   .aiwf-qa p { font-size: 20px; font-weight: 400; line-height: 1.5; color: rgba(0,0,0,.6); }
   .aiwf-qa p + p { margin-top: 6px; }
 
+  /* ===== Phase 5: 案例二專屬（Skill pill / 查看更多 / 笑臉 icon） ===== */
+  .aiwf-skillpill {
+    background: #41332E; color: #F4E3DD; border-radius: 3px; padding: 1px 8px;
+    font-family: ui-monospace, 'SF Mono', SFMono-Regular, Menlo, monospace;
+    font-size: 22px; font-weight: 500; line-height: 1.4; white-space: nowrap;
+  }
+  .aiwf-more { display: inline-flex; gap: 8px; align-items: center; margin-left: 8px; }
+  .aiwf-more img { width: 32px; height: 32px; opacity: .7; }
+  .aiwf-more span { font-size: 20px; font-weight: 400; line-height: 1.45; color: rgba(0,0,0,.7); letter-spacing: -0.005em; }
+  .aiwf-more:hover span { text-decoration: underline; }
+  .aiwf-specs .row.skill { align-items: center; }
+  .aiwf-specs .row.skill .bar { min-height: 32px; }
+  .aiwf-face { position: relative; flex: 0 0 87px; width: 87px; height: 87px; overflow: hidden; }
+  .aiwf-face img { position: absolute; }
+  .aiwf-face .f1 { inset: 2.95% 4.76% 2.67% 4.76%; width: 90.5%; height: 94.4%; }
+  .aiwf-face .f2 { left: 21.49%; top: 58.93%; width: 56.7%; height: 17.1%; }
+  .aiwf-face .f3 { left: 67.71%; top: 34.68%; width: 13.1%; height: 18.7%; }
+  .aiwf-face .f4 { left: 17.86%; top: 37.5%; width: 14.2%; height: 18.2%; }
+
   /* ===== RWD ===== */
   @media (max-width: 900px) {
     header.aiwf-header .wrap { padding: 0 40px; }
@@ -365,6 +384,9 @@
     .aiwf-qa .icon { width: 72px; height: 72px; flex-basis: 72px; }
     .aiwf-qa h3 { font-size: 19px; }
     .aiwf-qa p { font-size: 17px; }
+    .aiwf-skillpill { font-size: 17px; }
+    .aiwf-more span { font-size: 16px; }
+    .aiwf-more img { width: 26px; height: 26px; }
   }
 </style>
 </head>
@@ -513,7 +535,69 @@
     </div>
   </section>
 
-  <!-- ===== Phase 5+: 之後階段接續於此 ===== -->
+  <!-- ===== Phase 5: 案例二 Design Docs ===== -->
+  <section class="aiwf-scenario">
+    <div class="wrap">
+      <div class="sc-head">
+        <p class="aiwf-label">[ 情境2 ]</p>
+        <h2 class="sc-title"><span class="hand">Design Docs：</span>從討論紀錄長出規格，減少交付後的來回溝通</h2>
+        <p class="sc-intro">「先出圖，規格之後補」這幾乎是每一次設計交付給開發的現實。<br>在有規模的團隊，規格文件有 PM 寫、有 design ops 維護、有 QA 驗收；但在新創、小團隊，或一人設計師的處境裡，這些角色全部集中在我身上。沒有 AI 之前，規格文件永遠是心有餘而力不足的那一項。</p>
+      </div>
+      <div class="aiwf-figure"><div class="ph" data-slot="design-docs-demo"><!-- 素材待補：Design Docs Demo --></div></div>
+      <div class="aiwf-specs">
+        <div class="row skill">
+          <span class="k">自定義 Skill</span><span class="bar"></span>
+          <span class="aiwf-skillpill">design-prd-spec</span>
+          <a class="aiwf-more" href="https://github.com/shihmuen/public-skills" target="_blank" rel="noopener">
+            <img src="/_assets/custom/aiwf/github-icon.png" alt="GitHub"><span>查看更多</span>
+          </a>
+        </div>
+        <div class="row"><span class="k">Purpose</span><span class="bar"></span><span class="v">這是我為「設計交付」建的 Skill。按六個維度拆解：頁面區塊、元件規格、排序邏輯、互動行為、Edge Case、API 相關。產出符合我格式的文件。</span></div>
+      </div>
+      <div class="aiwf-prompts">
+        <div class="bubble" style="width:815px">
+          <span class="tag">初始 Prompt</span>
+          <span class="msg">我想要製作一個 Skill，目的是未來我請你寫設計規格文件時，可以精準符合我的格式。請參考這份品牌館 PRD 當範本，把它的結構抽成模板。</span>
+        </div>
+        <div class="bubble" style="width:564px">
+          <span class="tag">專案記憶檔</span>
+          <span class="msg">每個專案對應一份記憶檔，討論過程與設計決策隨時寫入；可跨對話接續，供 Skill 讀取產出文件。</span>
+        </div>
+        <div class="bubble" style="flex:1 1 320px">
+          <span class="tag">Confluence 設計文件</span>
+          <span class="msg">請閱讀「2FA 註冊登入」討論的相關紀錄，請擬定一版設計文件草稿。</span>
+        </div>
+      </div>
+    </div>
+  </section>
+  <section class="aiwf-insight">
+    <div class="wrap">
+      <div class="in-text">
+        <p class="aiwf-label">[ What is Changing ]</p>
+        <div class="aiwf-flow">
+          <span class="step">建立專案記憶檔</span><span class="arr"><img src="/_assets/custom/aiwf/flow-arrow.svg" alt="→"></span>
+          <span class="step">討論與決策隨時寫入</span><span class="arr"><img src="/_assets/custom/aiwf/flow-arrow.svg" alt="→"></span>
+          <span class="step">Skill 套用模板</span><span class="arr"><img src="/_assets/custom/aiwf/flow-arrow.svg" alt="→"></span>
+          <span class="step">長出 PRD</span>
+        </div>
+        <p class="in-note">每次展開新的 Feature，我會建立對應的記憶檔，過程中的討論與設計決策隨時寫入；要交付時，Skill 讀取這份紀錄、Figma 設計稿、再套上我的文件模板。PRD 不是從空白頁開始寫，而是<strong>「從記憶裡長出來」</strong>。寫文件的工作，也從<strong>「回想每個決策」</strong>變成<strong>「確認每個決策」</strong>。</p>
+      </div>
+      <aside class="aiwf-qa">
+        <div class="aiwf-face" aria-hidden="true">
+          <img class="f1" src="/_assets/custom/aiwf/face-1.svg" alt="">
+          <img class="f2" src="/_assets/custom/aiwf/face-2.svg" alt="">
+          <img class="f3" src="/_assets/custom/aiwf/face-3.svg" alt="">
+          <img class="f4" src="/_assets/custom/aiwf/face-4.svg" alt="">
+        </div>
+        <div class="txt">
+          <h3>「建立專案記憶檔」還有什麼用途？</h3>
+          <p>記憶檔是「一次紀錄，多種產出」的源頭：同一份討論紀錄，可以長出 PRD、開出 Jira ticket、產出貼在設計稿旁的 Figma annotation。內容來自同樣的記憶，幫助我省下很多時間。</p>
+        </div>
+      </aside>
+    </div>
+  </section>
+
+  <!-- ===== Phase 6+: 之後階段接續於此 ===== -->
 
 </main>
 
