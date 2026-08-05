@@ -177,7 +177,18 @@
     return /^\/((zh|en)\/)?about-me\/?$/.test(location.pathname);
   }
 
+  function ensureIconStyle() {
+    if (document.getElementById('molly-focus-icon-style')) return;
+    var st = document.createElement('style');
+    st.id = 'molly-focus-icon-style';
+    // 參數沿用站上原生按鈕 hover：OUT_CUBIC(.215,.61,.355,1) 0.3s
+    st.textContent = '[data-molly-focus-icon]{transition:transform .3s cubic-bezier(.215,.61,.355,1) !important;}' +
+      '[data-molly-focus-icon]:hover{transform:translateY(-4px) scale(1.05) !important;}';
+    document.head.appendChild(st);
+  }
+
   function applyIcon() {
+    ensureIconStyle();
     // 每個 breakpoint 的 focus 資料夾各有一對 CD 圖；以共同父層配對
     var cds = [];
     CD_HASHES.forEach(function (h) {
@@ -221,11 +232,18 @@
       ic.setAttribute('data-molly-focus-icon', '1');
       // 不能 append 在容器最後也不能加 z-index：資料夾「前蓋」是 CD 之後的兄弟節點，
       // 靠 DOM 順序蓋住 CD 下半部；icon 要插在最後一張 CD 之後、前蓋之前，才會一起被夾住
-      ic.style.cssText = 'position:absolute;pointer-events:none;' +
+      // pointer-events:auto 才 hover 得到；點擊轉發給底下的 CD，不擋原本的 Apple Music 連結
+      ic.style.cssText = 'position:absolute;pointer-events:auto;cursor:pointer;' +
         'width:' + size + 'px;height:' + size + 'px;' +
         'left:' + Math.round(left + w / 2 - size / 2) + 'px;' +
-        'top:' + Math.round(top + cdH * 0.38 - size / 2 + 16) + 'px;' +  // +16px：Molly 08-05 兩次微調往下移
+        'top:' + Math.round(top + cdH * 0.38 - size / 2 + 24) + 'px;' +  // +24px：Molly 08-05 三次微調往下移
         'filter:drop-shadow(0 6px 14px rgba(0,0,0,.28));';
+      ic.addEventListener('click', function (e) {
+        ic.style.pointerEvents = 'none';
+        var under = document.elementFromPoint(e.clientX, e.clientY);
+        ic.style.pointerEvents = 'auto';
+        if (under && under !== ic) under.click();
+      });
       var lastWrap = null;
       Array.prototype.forEach.call(g.el.children, function (c) {
         if (c.contains(g.imgs[0]) || c.contains(g.imgs[1])) lastWrap = c;
