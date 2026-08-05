@@ -202,7 +202,7 @@ const SNIPPET = `<script id="${MARKER}">
     st.id = 'molly-hover-works';
     st.textContent = '#molly-ai-collab-card img[data-molly-cover]{transition:transform .55s cubic-bezier(.34,1.45,.64,1),opacity .3s ease !important;}' +
         '#molly-ai-collab-card [data-molly-cover-box]{overflow:hidden;}' +
-        '#molly-ai-collab-card.molly-in:hover img[data-molly-cover]{transform:scale(.95) !important;opacity:.8 !important;}' +
+        '#molly-ai-collab-card [data-molly-cover-box]:hover img[data-molly-cover]{transform:scale(.95) !important;opacity:.8 !important;}' +
         '#molly-ai-collab-card.molly-in{transition:transform .3s cubic-bezier(.215,.61,.355,1),opacity .3s ease !important;}' +
         '#molly-ai-collab-card.molly-in:hover{transform:scale(.98) !important;}' +
         '#molly-ai-collab-card.molly-in:active{transform:scale(.95) !important;opacity:.8 !important;}' +
