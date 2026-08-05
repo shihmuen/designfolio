@@ -225,9 +225,12 @@
       if (st.opacity !== '' && parseFloat(st.opacity) < 1) st.opacity = '1';
       if (st.transform && st.transform !== 'none') st.transform = 'none';
     }
-    // Read Story 保留外觀但不可點（內頁未完成）；同時擋掉繼承自原卡的任何點擊行為
-    clone.addEventListener('click', function (e) { e.preventDefault(); e.stopPropagation(); }, true);
-    clone.style.cursor = 'default';
+    // 整張卡導向詳情頁（攔下繼承自原卡的舊行為，改為自己的連結）
+    clone.addEventListener('click', function (e) {
+      e.preventDefault(); e.stopPropagation();
+      window.location.href = '/my-ai-workflow';
+    }, true);
+    clone.style.cursor = 'pointer';
     return clone;
   }
 
@@ -450,8 +453,17 @@
       if (st.opacity !== '' && parseFloat(st.opacity) < 1) st.opacity = '1';
       if (st.transform && st.transform !== 'none') st.transform = 'none';
     }
-    // Read Story 暫不可點（內頁未完成）
-    clone.addEventListener('click', function (e) { e.preventDefault(); e.stopPropagation(); }, true);
+    // 卡片區導向詳情頁（標題帶的區塊不攔，維持區塊標題無互動的慣例）
+    clone.addEventListener('click', function (e) {
+      var card = keep;
+      if (card && card.contains(e.target)) {
+        e.preventDefault(); e.stopPropagation();
+        window.location.href = '/my-ai-workflow';
+      } else {
+        e.preventDefault(); e.stopPropagation();
+      }
+    }, true);
+    if (keep) keep.style.cursor = 'pointer';
     return clone;
   }
 

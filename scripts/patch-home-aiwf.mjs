@@ -154,8 +154,17 @@ const SNIPPET = `<script id="${MARKER}">
       if (st.opacity !== '' && parseFloat(st.opacity) < 1) st.opacity = '1';
       if (st.transform && st.transform !== 'none') st.transform = 'none';
     }
-    // Read Story 暫不可點（內頁未完成）
-    clone.addEventListener('click', function (e) { e.preventDefault(); e.stopPropagation(); }, true);
+    // 卡片區導向詳情頁（標題帶的區塊不攔，維持區塊標題無互動的慣例）
+    clone.addEventListener('click', function (e) {
+      var card = keep;
+      if (card && card.contains(e.target)) {
+        e.preventDefault(); e.stopPropagation();
+        window.location.href = '/my-ai-workflow';
+      } else {
+        e.preventDefault(); e.stopPropagation();
+      }
+    }, true);
+    if (keep) keep.style.cursor = 'pointer';
     return clone;
   }
 

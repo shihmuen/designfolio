@@ -70,9 +70,12 @@ const SNIPPET = `<script id="${MARKER}">
       if (st.opacity !== '' && parseFloat(st.opacity) < 1) st.opacity = '1';
       if (st.transform && st.transform !== 'none') st.transform = 'none';
     }
-    // Read Story 保留外觀但不可點（內頁未完成）；同時擋掉繼承自原卡的任何點擊行為
-    clone.addEventListener('click', function (e) { e.preventDefault(); e.stopPropagation(); }, true);
-    clone.style.cursor = 'default';
+    // 整張卡導向詳情頁（攔下繼承自原卡的舊行為，改為自己的連結）
+    clone.addEventListener('click', function (e) {
+      e.preventDefault(); e.stopPropagation();
+      window.location.href = '/my-ai-workflow';
+    }, true);
+    clone.style.cursor = 'pointer';
     return clone;
   }
 
