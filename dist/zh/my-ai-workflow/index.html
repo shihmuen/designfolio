@@ -253,6 +253,57 @@
   .aiwf-transition h2 { font-size: 32px; font-weight: 600; line-height: 1.5; letter-spacing: -0.02em; color: var(--ink); }
   .aiwf-transition h2 .hand { font-family: 'FigmaHandBold', var(--font); font-weight: 700; font-size: 36px; }
 
+  /* ===== Phase 4+: 案例章節（Scenario 通用樣式，案例一～三共用） ===== */
+  .aiwf-scenario .wrap { display: flex; flex-direction: column; gap: 48px; padding: 80px 64px 60px; }
+  .aiwf-scenario .sc-head { display: flex; flex-direction: column; gap: 16px; }
+  .aiwf-scenario .sc-title { font-size: 32px; font-weight: 700; line-height: 1.5; letter-spacing: -0.02em; color: var(--ink); }
+  .aiwf-scenario .sc-title .hand { font-family: 'FigmaHandBold', var(--font); font-size: 36px; }
+  .aiwf-scenario .sc-intro { font-size: 20px; font-weight: 500; line-height: 1.45; letter-spacing: -0.005em; color: var(--ink-55); }
+
+  .aiwf-figure { width: 100%; aspect-ratio: 1152 / 623; position: relative; }
+  .aiwf-figure .ph {
+    position: absolute; left: 51px; right: 51px; top: 50%; transform: translateY(-50%);
+    aspect-ratio: 824 / 424; background: #DCCCC7; border-radius: 8px;
+  }
+
+  .aiwf-specs { display: flex; flex-direction: column; gap: 16px; }
+  .aiwf-specs .row { display: flex; gap: 20px; align-items: flex-start; }
+  .aiwf-specs .k {
+    flex: 0 0 126px; text-align: right; font-size: 22px; font-weight: 500;
+    line-height: 1.45; color: rgba(0,0,0,.7); letter-spacing: -0.005em;
+  }
+  .aiwf-specs .bar { flex: 0 0 2px; align-self: stretch; min-height: 28px; background: rgba(153,110,94,.5); border-radius: 1px; }
+  .aiwf-specs .v { flex: 1; font-size: 22px; font-weight: 500; line-height: 1.45; color: rgba(0,0,0,.7); letter-spacing: -0.005em; }
+
+  .aiwf-prompts { display: flex; flex-wrap: wrap; gap: 24px; align-items: stretch; }
+  .aiwf-prompts .bubble {
+    background: #FEF3F0; border: 1px solid rgba(0,0,0,.1); border-radius: 16px;
+    padding: 20px 24px; display: flex; flex-direction: column; gap: 8px; max-width: 100%;
+  }
+  .aiwf-prompts .bubble .tag { font-size: 18px; line-height: 1.4; color: rgba(0,0,0,.45); font-weight: 500; }
+  .aiwf-prompts .bubble .msg { font-size: 20px; line-height: 1.4; color: rgba(0,0,0,.7); font-weight: 500; }
+
+  .aiwf-insight { background: #EDD4CA; }
+  .aiwf-insight .wrap { display: flex; flex-direction: column; gap: 48px; padding: 60px 64px; }
+  .aiwf-insight .in-text { display: flex; flex-direction: column; gap: 16px; }
+  .aiwf-flow { display: flex; flex-wrap: wrap; gap: 12px; align-items: center; }
+  .aiwf-flow .step { font-size: 28px; font-weight: 600; letter-spacing: -0.02em; color: var(--ink); line-height: 2.2; white-space: nowrap; }
+  .aiwf-flow .arr { width: 36px; height: 24px; flex: 0 0 36px; }
+  .aiwf-flow .arr img { width: 100%; height: 100%; }
+  .aiwf-insight .in-note { font-size: 20px; font-weight: 500; line-height: 1.5; letter-spacing: -0.02em; color: var(--ink-55); }
+  .aiwf-insight .in-note strong, .aiwf-qa strong { font-weight: 600; color: #7E4834; }
+
+  .aiwf-qa {
+    background: rgba(254,243,240,.7); border: 1.5px solid rgba(153,110,94,.4); border-radius: 20px;
+    padding: 24px; display: flex; gap: 8px; align-items: flex-start;
+  }
+  .aiwf-qa .icon { flex: 0 0 100px; width: 100px; height: 100px; }
+  .aiwf-qa .icon img { width: 100%; height: 100%; object-fit: contain; }
+  .aiwf-qa .txt { display: flex; flex-direction: column; gap: 8px; flex: 1; }
+  .aiwf-qa h3 { font-size: 22px; font-weight: 600; line-height: 1.45; letter-spacing: -0.005em; color: rgba(0,0,0,.7); }
+  .aiwf-qa p { font-size: 20px; font-weight: 400; line-height: 1.5; color: rgba(0,0,0,.6); }
+  .aiwf-qa p + p { margin-top: 6px; }
+
   /* ===== RWD ===== */
   @media (max-width: 900px) {
     header.aiwf-header .wrap { padding: 0 40px; }
@@ -267,6 +318,12 @@
     .aiwf-daily .aiwf-label, .aiwf-daily-title { text-align: center; }
     .aiwf-balance { width: 56px; height: 88px; flex-basis: 56px; }
     .aiwf-transition .wrap { padding: 88px 40px; }
+    .aiwf-scenario .wrap { padding: 64px 40px 48px; }
+    .aiwf-insight .wrap { padding: 48px 40px; }
+    .aiwf-figure .ph { left: 24px; right: 24px; }
+    .aiwf-prompts .bubble { width: 100% !important; }
+    .aiwf-flow .step { font-size: 22px; line-height: 1.8; }
+    .aiwf-flow .arr { width: 28px; height: 19px; flex-basis: 28px; }
   }
   @media (max-width: 560px) {
     header.aiwf-header { height: 90px; }
@@ -292,6 +349,22 @@
     .aiwf-transition .wrap { padding: 64px 24px; }
     .aiwf-transition h2 { font-size: 24px; }
     .aiwf-transition h2 .hand { font-size: 27px; }
+    .aiwf-scenario .wrap { padding: 48px 24px 40px; }
+    .aiwf-insight .wrap { padding: 40px 24px; }
+    .aiwf-scenario .sc-title { font-size: 24px; }
+    .aiwf-scenario .sc-title .hand { font-size: 27px; }
+    .aiwf-scenario .sc-intro, .aiwf-insight .in-note { font-size: 17px; }
+    .aiwf-specs .row { flex-direction: column; gap: 6px; }
+    .aiwf-specs .k { flex: none; text-align: left; font-size: 17px; color: rgba(0,0,0,.5); }
+    .aiwf-specs .bar { display: none; }
+    .aiwf-specs .v { font-size: 18px; }
+    .aiwf-prompts .bubble .tag { font-size: 15px; }
+    .aiwf-prompts .bubble .msg { font-size: 17px; }
+    .aiwf-flow .step { font-size: 18px; }
+    .aiwf-qa { flex-direction: column; gap: 12px; }
+    .aiwf-qa .icon { width: 72px; height: 72px; flex-basis: 72px; }
+    .aiwf-qa h3 { font-size: 19px; }
+    .aiwf-qa p { font-size: 17px; }
   }
 </style>
 </head>
@@ -386,7 +459,61 @@
     </div>
   </section>
 
-  <!-- ===== Phase 4+: 之後階段接續於此 ===== -->
+  <!-- ===== Phase 4: 案例一 POC ===== -->
+  <section class="aiwf-scenario">
+    <div class="wrap">
+      <div class="sc-head">
+        <p class="aiwf-label">[ 情境1 ]</p>
+        <h2 class="sc-title"><span class="hand">POC：</span>幫助團隊溝通、對齊目標，避免靠想像力開會</h2>
+        <p class="sc-intro">我沒有 coding 相關背景。過去要對齊一個功能想法，只能用靜態的 wireframe、lo-fi 的 prototype 再加上口頭描述。即便仔細來回對齊所有 Stakeholders 的需求，但還是出現不少次精緻稿 mockup 完成時再砍掉重來的情況。</p>
+      </div>
+      <div class="aiwf-figure"><div class="ph" data-slot="poc-demo"><!-- 素材待補：POC Demo --></div></div>
+      <div class="aiwf-specs">
+        <div class="row"><span class="k">Product</span><span class="bar"></span><span class="v">電商供應商後台</span></div>
+        <div class="row"><span class="k">Background</span><span class="bar"></span><span class="v">因應後台登入機制的修改，調整 註冊登入、開店上架 Onboarding 流程設計，並導入兩步驗證 (2FA) 強化後台安全。</span></div>
+        <div class="row"><span class="k">Purpose</span><span class="bar"></span><span class="v">此任務屬於「優化舊流程」，POC 可以一次清楚地展示與原流程有差異的地方，幫助團隊同步。</span></div>
+      </div>
+      <div class="aiwf-prompts">
+        <div class="bubble" style="width:880px">
+          <span class="tag">初始 Prompt</span>
+          <span class="msg">我要製作一個 POC demo 模擬各種需要 2FA 登入的情境以及用戶以 Owner 身份進到平台後所擁有的權限設定 ...... 。<br>有問題請先提出；最後透過 Vercel 部署成可共享的正式連結，提供給團隊成員看</span>
+        </div>
+        <div class="bubble" style="width:431px">
+          <span class="tag">2FA 出場的情境討論</span>
+          <span class="msg">「刪除用戶」屬於敏感操作，執行前需要跳 2FA。其他操作幫我一起盤點分級</span>
+        </div>
+        <div class="bubble" style="width:697px">
+          <span class="tag">權限模型與狀態衝突討論</span>
+          <span class="msg">同一個組織，能不能有多位 Owner？假設只有一位 Owner，那 Owner 帳號「啟用狀態」以及「2FA 綁定狀態」哪些狀態組合其實是有衝突的？</span>
+        </div>
+      </div>
+    </div>
+  </section>
+  <section class="aiwf-insight">
+    <div class="wrap">
+      <div class="in-text">
+        <p class="aiwf-label">[ What is Changing ]</p>
+        <div class="aiwf-flow">
+          <span class="step">POC</span><span class="arr"><img src="/_assets/custom/aiwf/flow-arrow.svg" alt="→"></span>
+          <span class="step">部署成連結</span><span class="arr"><img src="/_assets/custom/aiwf/flow-arrow.svg" alt="→"></span>
+          <span class="step">團隊討論</span><span class="arr"><img src="/_assets/custom/aiwf/flow-arrow.svg" alt="→"></span>
+          <span class="step">定稿</span><span class="arr"><img src="/_assets/custom/aiwf/flow-arrow.svg" alt="→"></span>
+          <span class="step">轉 Figma</span>
+        </div>
+        <p class="in-note">「Figma 執行」變成整個流程的最後一步。過去是邊確認需求、邊修改設計稿與 Prototype；現在想法在 POC 上對齊、收斂，進 Figma 時，畫的已經是定稿。<strong>需求變動的成本</strong>，也從<strong>「重畫一版 Mockup」</strong>變成<strong>「改一段 Prompt」</strong>。</p>
+      </div>
+      <aside class="aiwf-qa">
+        <div class="icon" aria-hidden="true"><img src="/_assets/custom/aiwf/lightbulb.svg" alt=""></div>
+        <div class="txt">
+          <h3>「我」做的 POC 與「其他人」做的有什麼差異？</h3>
+          <p>我做的 POC 更貼近<strong>「真實的產品」</strong>：符合品牌的設計系統、一致性與語調，操作與互動也貼近現實，連假資料都符合真實的商業邏輯。</p>
+          <p>差異來自於我餵給 AI 的東西：詳細的設計系統規範、個人的驗收標準、真實的使用情境 ... 等。POC 越接近真實，團隊的回饋也就越清晰。</p>
+        </div>
+      </aside>
+    </div>
+  </section>
+
+  <!-- ===== Phase 5+: 之後階段接續於此 ===== -->
 
 </main>
 
