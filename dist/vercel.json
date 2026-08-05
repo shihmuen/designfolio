@@ -30,5 +30,16 @@
       "source": "/:path*",
       "destination": "/zh/:path*"
     }
+  ],
+  "headers": [
+    {
+      "source": "/_videos/v1/(.*)",
+      "headers": [
+        {
+          "key": "Content-Type",
+          "value": "video/quicktime"
+        }
+      ]
+    }
   ]
 }

@@ -66,6 +66,9 @@ for (const [lang, origin] of Object.entries(SITES)) {
 
 // 1b. vercel.json — cookie-based language rewrites (fallback = zh, Molly's default)
 const vercelConfig = {
+  headers: [
+    { source: '/_videos/v1/(.*)', headers: [{ key: 'Content-Type', value: 'video/quicktime' }] },
+  ],
   rewrites: [
     { source: '/', has: [{ type: 'cookie', key: 'molly-lang', value: 'en' }], destination: '/en/index.html' },
     { source: '/', destination: '/zh/index.html' },
