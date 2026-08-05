@@ -119,11 +119,42 @@ const SNIPPET = `<script id="${MARKER}">
           relBox.style.overflow = 'hidden';
           relBox.setAttribute('data-molly-cover-box', '1');
         }
+        im.style.transform = ''; // 清 inline 殘留，讓樣式表的 scale(1.06) 生效
         im.setAttribute('data-molly-cover', '1');
       } else {
         (im.parentElement || im).style.display = 'none';
       }
     }
+  }
+
+
+  // Read Story 按鈕標記（hover 反色用）：從文字節點往上爬到含箭頭 icon 的外框
+  function tagReadStory(scope) {
+    var walker = document.createTreeWalker(scope, NodeFilter.SHOW_TEXT, null);
+    var n;
+    while ((n = walker.nextNode())) {
+      if (n.nodeValue.trim() === 'Read Story') {
+        var btn = n.parentElement;
+        for (var d = 0; d < 4 && btn && !btn.querySelector('img'); d++) btn = btn.parentElement;
+        if (btn) btn.setAttribute('data-molly-btn', '1');
+        return;
+      }
+    }
+  }
+
+  // 出場動畫：對齊原生卡的捲動淡入上移
+  function entrance(el) {
+    el.style.opacity = '0';
+    el.style.transform = 'translateY(120px)';
+    el.style.transition = 'opacity .9s cubic-bezier(.16,1,.3,1), transform .9s cubic-bezier(.16,1,.3,1)';
+    function show() { el.style.opacity = '1'; el.style.transform = 'none'; }
+    if ('IntersectionObserver' in window) {
+      var io = new IntersectionObserver(function (es) {
+        es.forEach(function (e) { if (e.isIntersecting) { requestAnimationFrame(show); io.disconnect(); } });
+      }, { threshold: 0.1 });
+      io.observe(el);
+      setTimeout(function () { if (el.style.opacity === '0' && innerHeight > 0 && el.getBoundingClientRect().top < innerHeight) show(); }, 3000);
+    } else { show(); }
   }
 
   function mount() {
@@ -134,8 +165,10 @@ const SNIPPET = `<script id="${MARKER}">
     var card = findCard();
     if (!card || !card.parentElement) return;
     var clone = build(card);
+    tagReadStory(clone);
     card.parentElement.insertBefore(clone, card);
     fixImages(clone, card);
+    entrance(clone);
   }
 
   var scheduled = false;
@@ -148,9 +181,13 @@ const SNIPPET = `<script id="${MARKER}">
     if (document.getElementById('molly-card-hover-style')) return;
     var st = document.createElement('style');
     st.id = 'molly-card-hover-style';
-    st.textContent = '[data-molly-cover]{transition:transform .6s cubic-bezier(.16,1,.3,1);}' +
+    st.textContent = 'img[data-molly-cover]{transform:scale(1.06) !important;transition:transform .6s cubic-bezier(.16,1,.3,1) !important;}' +
         '[data-molly-cover-box]{overflow:hidden;}' +
-        '#molly-ai-collab-card:hover [data-molly-cover],#molly-aiwf-section [data-molly-card]:hover [data-molly-cover]{transform:scale(1.05);}';
+        '#molly-ai-collab-card:hover img[data-molly-cover],#molly-aiwf-section [data-molly-card]:hover img[data-molly-cover]{transform:scale(1) !important;}' +
+        '[data-molly-btn]{transition:background-color .35s,border-color .35s;}' +
+        '[data-molly-btn]:hover{background-color:#111 !important;}' +
+        '[data-molly-btn]:hover *{color:#fff !important;}' +
+        '[data-molly-btn]:hover img{filter:invert(1);}';
     document.head.appendChild(st);
   }
 
