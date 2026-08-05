@@ -81,12 +81,19 @@ const SNIPPET = `<script id="${MARKER}">
       ic.src = ICON;
       ic.alt = '';
       ic.setAttribute('data-molly-focus-icon', '1');
-      ic.style.cssText = 'position:absolute;z-index:5;pointer-events:none;' +
+      // 不能 append 在容器最後也不能加 z-index：資料夾「前蓋」是 CD 之後的兄弟節點，
+      // 靠 DOM 順序蓋住 CD 下半部；icon 要插在最後一張 CD 之後、前蓋之前，才會一起被夾住
+      ic.style.cssText = 'position:absolute;pointer-events:none;' +
         'width:' + size + 'px;height:' + size + 'px;' +
         'left:' + Math.round(left + w / 2 - size / 2) + 'px;' +
         'top:' + Math.round(top + cdH * 0.38 - size / 2) + 'px;' +
         'filter:drop-shadow(0 6px 14px rgba(0,0,0,.28));';
-      g.el.appendChild(ic);
+      var lastWrap = null;
+      Array.prototype.forEach.call(g.el.children, function (c) {
+        if (c.contains(g.imgs[0]) || c.contains(g.imgs[1])) lastWrap = c;
+      });
+      if (lastWrap) g.el.insertBefore(ic, lastWrap.nextSibling);
+      else g.el.appendChild(ic);
     });
   }
 
