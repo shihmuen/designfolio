@@ -782,7 +782,7 @@
       ic.style.cssText = 'position:absolute;pointer-events:none;' +
         'width:' + size + 'px;height:' + size + 'px;' +
         'left:' + Math.round(left + w / 2 - size / 2) + 'px;' +
-        'top:' + Math.round(top + cdH * 0.38 - size / 2) + 'px;' +
+        'top:' + Math.round(top + cdH * 0.38 - size / 2 + 8) + 'px;' +  // +8px：Molly 08-05 拍板再往下移
         'filter:drop-shadow(0 6px 14px rgba(0,0,0,.28));';
       var lastWrap = null;
       Array.prototype.forEach.call(g.el.children, function (c) {
