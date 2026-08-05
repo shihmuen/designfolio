@@ -73,9 +73,9 @@ const SNIPPET = `<script id="${MARKER}">
       var top = Math.min(r1.top, r2.top) - host.top;
       var w = Math.max(r1.right, r2.right) - Math.min(r1.left, r2.left);
       var cdH = Math.max(r1.height, r2.height);
-      // 依設計稿：icon 寬 ≈ CD 的 0.55、水平置中於兩張 CD、垂直中心在 CD 高度的 38%
+      // icon 寬 ≈ CD 的 0.44（0.55 再縮 20%，Molly 08-05 拍板）、水平置中於兩張 CD、垂直中心在 CD 高度的 38%
       // （CD 下半被資料夾標籤帶蓋住，置中於整張圖會壓到標題）
-      var size = Math.round(r1.width * 0.55);
+      var size = Math.round(r1.width * 0.44);
       if (getComputedStyle(g.el).position === 'static') g.el.style.position = 'relative';
       var ic = document.createElement('img');
       ic.src = ICON;
