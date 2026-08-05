@@ -197,17 +197,17 @@ const SNIPPET = `<script id="${MARKER}">
     setTimeout(function () { scheduled = false; mount(); }, 150);
   }
   function ensureHoverStyle() {
-    if (document.getElementById('molly-card-hover-style')) return;
+    if (document.getElementById('molly-hover-works')) return;
     var st = document.createElement('style');
-    st.id = 'molly-card-hover-style';
-    st.textContent = 'img[data-molly-cover]{transition:transform .55s cubic-bezier(.34,1.45,.64,1),opacity .3s ease !important;}' +
-        '[data-molly-cover-box]{overflow:hidden;}' +
-        '.molly-in:hover img[data-molly-cover]{transform:scale(.95) !important;opacity:.8 !important;}' +
-        '.molly-in{transition:transform .3s cubic-bezier(.215,.61,.355,1),opacity .3s ease !important;}' +
-        '.molly-in:hover{transform:scale(.98) !important;}' +
-        '.molly-in:active{transform:scale(.95) !important;opacity:.8 !important;}' +
-        '[data-molly-btn]{transition:transform .3s cubic-bezier(.215,.61,.355,1) !important;}' +
-        '.molly-in [data-molly-btn]:hover{transform:scale(.9) !important;}';
+    st.id = 'molly-hover-works';
+    st.textContent = '#molly-ai-collab-card img[data-molly-cover]{transition:transform .55s cubic-bezier(.34,1.45,.64,1),opacity .3s ease !important;}' +
+        '#molly-ai-collab-card [data-molly-cover-box]{overflow:hidden;}' +
+        '#molly-ai-collab-card.molly-in:hover img[data-molly-cover]{transform:scale(.95) !important;opacity:.8 !important;}' +
+        '#molly-ai-collab-card.molly-in{transition:transform .3s cubic-bezier(.215,.61,.355,1),opacity .3s ease !important;}' +
+        '#molly-ai-collab-card.molly-in:hover{transform:scale(.98) !important;}' +
+        '#molly-ai-collab-card.molly-in:active{transform:scale(.95) !important;opacity:.8 !important;}' +
+        '#molly-ai-collab-card [data-molly-btn]{transition:transform .3s cubic-bezier(.215,.61,.355,1) !important;}' +
+        '#molly-ai-collab-card.molly-in [data-molly-btn]:hover{transform:scale(.9) !important;}';
     document.head.appendChild(st);
   }
 
