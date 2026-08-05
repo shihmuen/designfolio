@@ -597,7 +597,59 @@
     </div>
   </section>
 
-  <!-- ===== Phase 6+: 之後階段接續於此 ===== -->
+  <!-- ===== Phase 6: 案例三 Design System ===== -->
+  <section class="aiwf-scenario">
+    <div class="wrap">
+      <div class="sc-head">
+        <p class="aiwf-label">[ 情境3 ]</p>
+        <h2 class="sc-title"><span class="hand">Design System</span>：把我的驗收標準教給 AI，執行、驗收、同步</h2>
+        <p class="sc-intro" style="font-size:18px">建立與維護設計系統靠的是大量人工：定義元件、整理 token、與前端對齊規範。<br>建出來的東西又多又複雜，管理成本高、不易遵守；團隊一忙，規範與現實就越走越遠，每隔一段時間又得重新整理一次。</p>
+      </div>
+      <div class="aiwf-figure"><div class="ph" data-slot="design-system-demo"><!-- 素材待補：Design System Demo --></div></div>
+      <div class="aiwf-specs">
+        <div class="row skill">
+          <span class="k">自定義 Skill</span><span class="bar"></span>
+          <span class="aiwf-skillpill">design-execution</span>
+          <a class="aiwf-more" href="https://github.com/shihmuen/public-skills" target="_blank" rel="noopener">
+            <img src="/_assets/custom/aiwf/github-icon.png" alt="GitHub"><span>查看更多</span>
+          </a>
+        </div>
+        <div class="row"><span class="k">Purpose</span><span class="bar"></span><span class="v">這是我為「執行設計稿」建的 Skill。執行前自動判斷平台（後台 / 前台 / APP）與模式（新建 / 修改 / RWD），載入對應的設計規範與 Token 清單再動手，產出直接通過我驗收的設計稿。</span></div>
+      </div>
+      <div class="aiwf-prompts">
+        <div class="bubble" style="width:807px">
+          <span class="tag">初始 Prompt</span>
+          <span class="msg">我想要製作一個 Skill，目的是未來我要你執行設計稿時，可以精準地達到我的標準。</span>
+        </div>
+        <div class="bubble" style="width:564px">
+          <span class="tag">遵守品牌設計規範</span>
+          <span class="msg">「邀請成員 Dialog」請參考品牌的 Dialog Component 製作，需符合後台設計風格。</span>
+        </div>
+        <div class="bubble" style="flex:1 1 320px">
+          <span class="tag">建立 Component</span>
+          <span class="msg">Card_Member 還需要多一個「使用者本身」的狀態，請建議我 Component Property 要怎麼設計。</span>
+        </div>
+      </div>
+    </div>
+  </section>
+  <section class="aiwf-insight">
+    <div class="wrap">
+      <div class="in-text">
+        <p class="aiwf-label">[ What is Changing ]</p>
+        <div class="aiwf-flow">
+          <span class="step">執行自定義規範</span><span class="arr"><img src="/_assets/custom/aiwf/flow-arrow.svg" alt="→"></span>
+          <span class="step">節點建立、綁 Design Token</span><span class="arr"><img src="/_assets/custom/aiwf/flow-arrow.svg" alt="→"></span>
+          <span class="step">100% 綁定稽核</span><span class="arr"><img src="/_assets/custom/aiwf/flow-arrow.svg" alt="→"></span>
+          <span class="step">新的調整寫成規則</span><span class="arr"><img src="/_assets/custom/aiwf/flow-arrow.svg" alt="→"></span>
+          <span class="step">回寫 Skill，下次自帶</span>
+        </div>
+        <p class="in-note" style="margin-bottom:4px">AI 的第一版產出並不合格：色碼寫死、間距沒綁 Token、彈窗不用元件自己畫了一張卡片。</p>
+        <p class="in-note">差別在於<strong>「每一次糾正，我都寫成一條規則」</strong>。例如：顏色一律綁 Variable、Dialog 一律用 Library 元件、icon 一律用 Lucide 不用 emoji ... 同一個錯犯兩次，就升級成永久規範。</p>
+      </div>
+    </div>
+  </section>
+
+  <!-- ===== Phase 7+: 之後階段接續於此（NEXT PROJECT + Footer） ===== -->
 
 </main>
 
