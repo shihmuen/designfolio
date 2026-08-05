@@ -236,6 +236,23 @@
   .aiwf-claude strong.c1 { color: #8E4F38; }
   .aiwf-claude strong.c2 { color: #9A604B; }
 
+  /* ===== Phase 3: 過場（實際應用） ===== */
+  .aiwf-transition { position: relative; background: #EDD4CA; overflow: hidden; }
+  .aiwf-transition .art {
+    position: absolute; inset: 0; pointer-events: none; mix-blend-mode: overlay;
+  }
+  .aiwf-transition .art img {
+    position: absolute; left: 52.99%; top: -30.02%; width: 51.68%; height: 149.66%;
+    object-fit: contain; max-width: none;
+  }
+  .aiwf-transition .wrap {
+    position: relative; display: flex; flex-direction: column; gap: 16px;
+    padding: 120px 128px;
+  }
+  .aiwf-transition .aiwf-label { position: relative; }
+  .aiwf-transition h2 { font-size: 32px; font-weight: 600; line-height: 1.5; letter-spacing: -0.02em; color: var(--ink); }
+  .aiwf-transition h2 .hand { font-family: 'FigmaHandBold', var(--font); font-weight: 700; font-size: 36px; }
+
   /* ===== RWD ===== */
   @media (max-width: 900px) {
     header.aiwf-header .wrap { padding: 0 40px; }
@@ -249,6 +266,7 @@
     .aiwf-daily .wrap { text-align: left; }
     .aiwf-daily .aiwf-label, .aiwf-daily-title { text-align: center; }
     .aiwf-balance { width: 56px; height: 88px; flex-basis: 56px; }
+    .aiwf-transition .wrap { padding: 88px 40px; }
   }
   @media (max-width: 560px) {
     header.aiwf-header { height: 90px; }
@@ -271,6 +289,9 @@
     .aiwf-claude { flex-direction: column; gap: 16px; }
     .aiwf-claude h3 { font-size: 19px; }
     .aiwf-claude p { font-size: 17px; }
+    .aiwf-transition .wrap { padding: 64px 24px; }
+    .aiwf-transition h2 { font-size: 24px; }
+    .aiwf-transition h2 .hand { font-size: 27px; }
   }
 </style>
 </head>
@@ -356,7 +377,16 @@
     </div>
   </section>
 
-  <!-- ===== Phase 3+: 之後階段接續於此 ===== -->
+  <!-- ===== Phase 3: 過場（實際應用） ===== -->
+  <section class="aiwf-transition">
+    <div class="art" aria-hidden="true"><img src="/_assets/custom/aiwf/transition-hand.png" alt=""></div>
+    <div class="wrap">
+      <p class="aiwf-label">[ 實際應用 ]</p>
+      <h2><span class="hand">AI </span>如何改變我與團隊的對話方式 ?</h2>
+    </div>
+  </section>
+
+  <!-- ===== Phase 4+: 之後階段接續於此 ===== -->
 
 </main>
 
