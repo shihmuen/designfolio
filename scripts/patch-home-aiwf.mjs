@@ -99,7 +99,12 @@ const SNIPPET = `<script id="${MARKER}">
         var absBox = im.parentElement;
         if (absBox) { absBox.style.width = '100%'; absBox.style.height = '100%'; }
         var relBox = absBox && absBox.parentElement;
-        if (relBox) { relBox.style.height = 'auto'; relBox.style.aspectRatio = '716 / 461'; }
+        if (relBox) {
+          relBox.style.height = 'auto'; relBox.style.aspectRatio = '716 / 461';
+          relBox.style.overflow = 'hidden';
+          relBox.setAttribute('data-molly-cover-box', '1');
+        }
+        im.setAttribute('data-molly-cover', '1');
       } else {
         (im.parentElement || im).style.display = 'none';
       }
@@ -164,7 +169,7 @@ const SNIPPET = `<script id="${MARKER}">
         e.preventDefault(); e.stopPropagation();
       }
     }, true);
-    if (keep) keep.style.cursor = 'pointer';
+    if (keep) { keep.style.cursor = 'pointer'; keep.setAttribute('data-molly-card', '1'); }
     return clone;
   }
 
@@ -186,10 +191,22 @@ const SNIPPET = `<script id="${MARKER}">
     scheduled = true;
     setTimeout(function () { scheduled = false; mount(); }, 150);
   }
+  function ensureHoverStyle() {
+    if (document.getElementById('molly-card-hover-style')) return;
+    var st = document.createElement('style');
+    st.id = 'molly-card-hover-style';
+    st.textContent = '[data-molly-cover]{transition:transform .6s cubic-bezier(.16,1,.3,1);}' +
+        '[data-molly-cover-box]{overflow:hidden;}' +
+        '#molly-ai-collab-card:hover [data-molly-cover],#molly-aiwf-section [data-molly-card]:hover [data-molly-cover]{transform:scale(1.05);}';
+    document.head.appendChild(st);
+  }
+
   function boot() {
+    ensureHoverStyle();
     mount();
     new MutationObserver(scheduleMount).observe(document.documentElement, { childList: true, subtree: true });
     [500, 1500, 3000, 5000].forEach(function (t) { setTimeout(mount, t); });
+    setInterval(ensureHoverStyle, 1400);
     // SPA 轉場會把整棵 DOM 換掉，掛在舊樹上的 MutationObserver 會靜默死亡；
     // setInterval 掛在 window 上不受影響，當常駐心跳補掛。
     setInterval(function () { try { mount(); } catch (e) {} }, 700);
