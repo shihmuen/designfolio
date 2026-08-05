@@ -136,18 +136,37 @@ const SNIPPET = `<script id="${MARKER}">
       if (n.nodeValue.trim() === 'Read Story') {
         var btn = n.parentElement;
         for (var d = 0; d < 4 && btn && !btn.querySelector('img'); d++) btn = btn.parentElement;
-        if (btn) btn.setAttribute('data-molly-btn', '1');
+        if (btn) {
+          btn.setAttribute('data-molly-btn', '1');
+          if (!btn.__mollyMag) {
+            btn.__mollyMag = true;
+            // 縮放中心跟著游標：產生「按鈕跟著滑鼠微微移動」的原生手感
+            btn.addEventListener('mousemove', function (e) {
+              var r = btn.getBoundingClientRect();
+              btn.style.transformOrigin = ((e.clientX - r.left) / r.width * 100) + '% ' + ((e.clientY - r.top) / r.height * 100) + '%';
+            });
+            btn.addEventListener('mouseleave', function () { btn.style.transformOrigin = '50% 50%'; });
+          }
+        }
         return;
       }
     }
   }
 
-  // 出場動畫：對齊原生卡的捲動淡入上移
-  function entrance(el) {
+  // 出場動畫：參數照 works.json 的 appear（0.8s INOUT_CUBIC，入視窗淡入上移）。
+  // 完成後清掉 inline 樣式並掛 .molly-in，讓卡片層級的 hover/press CSS 接手。
+  function entrance(el, hoverTarget) {
     el.style.opacity = '0';
-    el.style.transform = 'translateY(120px)';
-    el.style.transition = 'opacity .9s cubic-bezier(.16,1,.3,1), transform .9s cubic-bezier(.16,1,.3,1)';
-    function show() { el.style.opacity = '1'; el.style.transform = 'none'; }
+    el.style.transform = 'translateY(140px)';
+    el.style.transition = 'opacity .8s cubic-bezier(.645,.045,.355,1), transform .8s cubic-bezier(.645,.045,.355,1)';
+    var done = false;
+    function finish() {
+      if (done) return;
+      done = true;
+      el.style.transition = ''; el.style.transform = ''; el.style.opacity = '';
+      (hoverTarget || el).classList.add('molly-in');
+    }
+    function show() { el.style.opacity = '1'; el.style.transform = 'translateY(0)'; setTimeout(finish, 850); }
     if ('IntersectionObserver' in window) {
       var io = new IntersectionObserver(function (es) {
         es.forEach(function (e) { if (e.isIntersecting) { requestAnimationFrame(show); io.disconnect(); } });
@@ -168,7 +187,7 @@ const SNIPPET = `<script id="${MARKER}">
     tagReadStory(clone);
     card.parentElement.insertBefore(clone, card);
     fixImages(clone, card);
-    entrance(clone);
+    entrance(clone, clone);
   }
 
   var scheduled = false;
@@ -181,13 +200,14 @@ const SNIPPET = `<script id="${MARKER}">
     if (document.getElementById('molly-card-hover-style')) return;
     var st = document.createElement('style');
     st.id = 'molly-card-hover-style';
-    st.textContent = 'img[data-molly-cover]{transition:transform .5s cubic-bezier(.16,1,.3,1),opacity .5s ease !important;}' +
+    st.textContent = 'img[data-molly-cover]{transition:transform .55s cubic-bezier(.34,1.45,.64,1),opacity .3s ease !important;}' +
         '[data-molly-cover-box]{overflow:hidden;}' +
-        '#molly-ai-collab-card:hover img[data-molly-cover],#molly-aiwf-section [data-molly-card]:hover img[data-molly-cover]{transform:scale(.95) !important;opacity:.85 !important;}' +
-        '[data-molly-btn]{transition:transform .35s cubic-bezier(.16,1,.3,1) !important;}' +
-        '[data-molly-btn]:hover{transform:scale(.95) !important;}' +
-        '[data-molly-btn] img{transition:transform .35s cubic-bezier(.16,1,.3,1) !important;}' +
-        '[data-molly-btn]:hover img{transform:translate(2px,-2px) !important;}';
+        '.molly-in:hover img[data-molly-cover]{transform:scale(.95) !important;opacity:.8 !important;}' +
+        '.molly-in{transition:transform .3s cubic-bezier(.215,.61,.355,1),opacity .3s ease !important;}' +
+        '.molly-in:hover{transform:scale(.98) !important;}' +
+        '.molly-in:active{transform:scale(.95) !important;opacity:.8 !important;}' +
+        '[data-molly-btn]{transition:transform .3s cubic-bezier(.215,.61,.355,1) !important;}' +
+        '.molly-in [data-molly-btn]:hover{transform:scale(.9) !important;}';
     document.head.appendChild(st);
   }
 
