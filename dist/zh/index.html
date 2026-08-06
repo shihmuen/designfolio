@@ -718,6 +718,16 @@
     'd731e89cbdbe7dc294c726d2dc810f4f00617817', '6ce4fe73aa81352535d8e6720309788fc59e0393'  // mobile
   ];
   var ICON = '/_assets/custom/aboutme/focus-mode-icon.png';
+  // FocusFlight 下載頁：Android 導 Google Play，其餘（iOS／iPadOS／桌機）導 App Store
+  var STORE_IOS = 'https://apps.apple.com/tw/app/focusflight-%E7%82%BA%E9%9B%A3%E4%BB%A5%E5%B0%88%E6%B3%A8%E7%9A%84%E4%BA%BA%E8%80%8C%E8%A8%AD%E8%A8%88/id6648771147';
+  var STORE_ANDROID = 'https://play.google.com/store/apps/details?id=com.focus.focusflight&hl=zh_TW';
+
+  function storeUrl() {
+    var ua = navigator.userAgent || '';
+    // Android 平板/手機（排除 Windows Phone 舊字串）
+    if (/Android/i.test(ua) && !/Windows Phone/i.test(ua)) return STORE_ANDROID;
+    return STORE_IOS;
+  }
   var HEART = '\u2764\uFE0F\u200D\uD83D\uDD25\uD83D\uDE0E';
   var STARKEY = '\u2B50\uD83D\uDD11';
   // mode line2：emoji 放在手寫字第二行行尾（xf＝行二字尾佔全寬比例）；
@@ -784,24 +794,26 @@
       // （CD 下半被資料夾標籤帶蓋住，置中於整張圖會壓到標題）
       var size = Math.round(r1.width * 0.44);
       if (getComputedStyle(g.el).position === 'static') g.el.style.position = 'relative';
-      var ic = document.createElement('img');
-      ic.src = ICON;
-      ic.alt = '';
+      var ic = document.createElement('a');
+      ic.href = storeUrl();
+      ic.target = '_blank';
+      ic.rel = 'noopener noreferrer';
+      ic.setAttribute('aria-label', 'FocusFlight');
       ic.setAttribute('data-molly-focus-icon', '1');
+      var icImg = document.createElement('img');
+      icImg.src = ICON;
+      icImg.alt = 'FocusFlight';
+      icImg.style.cssText = 'width:100%;height:100%;display:block;';
+      ic.appendChild(icImg);
       // 不能 append 在容器最後也不能加 z-index：資料夾「前蓋」是 CD 之後的兄弟節點，
       // 靠 DOM 順序蓋住 CD 下半部；icon 要插在最後一張 CD 之後、前蓋之前，才會一起被夾住
-      // pointer-events:auto 才 hover 得到；點擊轉發給底下的 CD，不擋原本的 Apple Music 連結
-      ic.style.cssText = 'position:absolute;pointer-events:auto;cursor:pointer;' +
+      // icon 是 FocusFlight 下載入口：用真正的 <a>（window.open 會被彈窗阻擋器擋掉，
+      // 且 <a> 才支援長按／中鍵開新分頁）；pointer-events:auto 才 hover／點擊得到
+      ic.style.cssText = 'position:absolute;display:block;pointer-events:auto;cursor:pointer;' +
         'width:' + size + 'px;height:' + size + 'px;' +
         'left:' + Math.round(left + w / 2 - size / 2) + 'px;' +
         'top:' + Math.round(top + cdH * 0.38 - size / 2 + 24) + 'px;' +  // +24px：Molly 08-05 三次微調往下移
         'filter:drop-shadow(0 6px 14px rgba(0,0,0,.28));';
-      ic.addEventListener('click', function (e) {
-        ic.style.pointerEvents = 'none';
-        var under = document.elementFromPoint(e.clientX, e.clientY);
-        ic.style.pointerEvents = 'auto';
-        if (under && under !== ic) under.click();
-      });
       var lastWrap = null;
       Array.prototype.forEach.call(g.el.children, function (c) {
         if (c.contains(g.imgs[0]) || c.contains(g.imgs[1])) lastWrap = c;
