@@ -304,8 +304,8 @@
   .ss-eyebrow { font-size: 14px; font-weight: 500; letter-spacing: .08em; color: rgba(0,0,0,.36); }
   .ss-id { display: flex; align-items: baseline; gap: 10px; }
   .ss-head .aiwf-skillpill { font-size: 18px; }  /* 卡內 pill（Molly 08-09 拍板 18px） */
-  /* 情境2「自定義 Skill」列的 pill 也收到 18px（情境3 維持 22px 未動） */
-  .aiwf-specs .row.skill.prd .aiwf-skillpill { font-size: 18px; }
+  /* 兩個情境的「自定義 Skill」列 pill 一起收到 18px */
+  .aiwf-specs .row.skill .aiwf-skillpill { font-size: 18px; }
   .ss-id .ss-name { font-size: 20px; font-weight: 700; color: var(--ink); letter-spacing: -0.01em; }
   .ss-trigger { display: flex; gap: 8px; align-items: baseline; flex-wrap: wrap; margin-left: auto; }
   .ss-k { flex: 0 0 auto; font-size: 14px; font-weight: 500; color: rgba(0,0,0,.36); line-height: 1.9; }
@@ -360,6 +360,17 @@
   }
   .ss-chapters .req.must { background: #41332E; color: #F4E3DD; }
   .ss-chapters .req.opt { background: rgba(153,110,94,.2); color: rgba(0,0,0,.5); }
+
+  /* 情境3 的驗收標準 A–F：深色字母徽章，和條列型的規範做出區隔 */
+  .ss-checks { display: flex; flex-direction: column; gap: 9px; }
+  .ss-checks li { display: grid; grid-template-columns: 22px 1fr; gap: 8px; align-content: start; }
+  .ss-checks .mk {
+    font-family: ui-monospace, 'SF Mono', SFMono-Regular, Menlo, monospace;
+    font-size: 11px; font-weight: 600; text-align: center; line-height: 1.9;
+    background: #41332E; color: #F4E3DD; border-radius: 3px;
+  }
+  .ss-checks p { font-size: 14px; font-weight: 500; line-height: 1.5; color: rgba(0,0,0,.55); }
+  .ss-checks b { font-weight: 600; color: var(--ink); margin-right: 6px; }
 
   .ss-rules { display: flex; flex-direction: column; gap: 9px; }
   .ss-rules li { display: grid; grid-template-columns: 26px 1fr; gap: 8px; align-content: start; }
@@ -706,7 +717,7 @@
         <p class="sc-intro">「先出圖，規格之後補」這幾乎是每一次設計交付給開發的現實。<br>在有規模的團隊，規格文件有 PM 寫、有 design ops 維護、有 QA 驗收；但在新創、小團隊，或一人設計師的處境裡，這些角色全部集中在我身上。沒有 AI 之前，規格文件永遠是心有餘而力不足的那一項。</p>
       </div>
       <div class="aiwf-skillspec">
-        <div class="ss-card" role="button" tabindex="0" aria-label="放大檢視 design-prd-spec 內容規範">
+        <div class="ss-card" role="button" tabindex="0" data-skill="design-prd-spec" aria-label="放大檢視 design-prd-spec 內容規範">
           <header class="ss-head">
             <p class="ss-eyebrow">SKILL 內容規範</p>
             <div class="ss-id">
@@ -783,6 +794,7 @@
           var wrap = host.querySelector('.ss-scroll');
           if (!card || !wrap) return;
           var body = wrap.querySelector('.ss-body');
+          var title = card.getAttribute('data-skill') || '內容規範';
 
           // 底部漸層：捲到底就淡出
           function sync() {
@@ -801,7 +813,7 @@
             lb.className = 'ss-lb';
             lb.setAttribute('role', 'dialog');
             lb.setAttribute('aria-modal', 'true');
-            lb.setAttribute('aria-label', 'design-prd-spec 內容規範');
+            lb.setAttribute('aria-label', title + ' 內容規範');
             var bd = document.createElement('div');
             bd.className = 'ss-lb-bd';
             var panel = document.createElement('div');
@@ -849,7 +861,7 @@
         })();
       </script>
       <div class="aiwf-specs">
-        <div class="row skill prd">
+        <div class="row skill">
           <span class="k">自定義 Skill</span><span class="bar"></span>
           <span class="aiwf-skillpill">design-prd-spec</span>
           <a class="aiwf-more" href="https://github.com/shihmuen/public-skills" target="_blank" rel="noopener">
@@ -909,7 +921,146 @@
         <h2 class="sc-title"><span class="hand">Design System</span>：把我的驗收標準教給 AI，執行、驗收、同步</h2>
         <p class="sc-intro" style="font-size:18px">建立與維護設計系統靠的是大量人工：定義元件、整理 token、與前端對齊規範。<br>建出來的東西又多又複雜，管理成本高、不易遵守；團隊一忙，規範與現實就越走越遠，每隔一段時間又得重新整理一次。</p>
       </div>
-      <div class="aiwf-figure"><div class="ph" data-slot="design-system-demo"><!-- 素材待補：Design System Demo --></div></div>
+      <div class="aiwf-skillspec">
+        <div class="ss-card" role="button" tabindex="0" data-skill="design-execution" aria-label="放大檢視 design-execution 內容規範">
+          <header class="ss-head">
+            <p class="ss-eyebrow">SKILL 內容規範</p>
+            <div class="ss-id">
+              <span class="aiwf-skillpill">design-execution</span>
+              <span class="ss-name">設計稿執行</span>
+            </div>
+            <div class="ss-trigger">
+              <span class="ss-k">觸發</span>
+              <span class="ss-chips">
+                <em>執行設計稿</em><em>修改設計稿</em><em>做 RWD 版本</em><em>符合驗收標準</em>
+              </span>
+            </div>
+          </header>
+
+          <div class="ss-scroll">
+          <div class="ss-body">
+            <section class="ss-col">
+              <h4>執行流程</h4>
+              <ol class="ss-steps">
+                <li><span class="ss-num">01</span><b>判斷模式</b>
+                  <p>新建／修改現有／RWD 多尺寸三選一。不確定時看有沒有附 Figma node-id：有就是修改模式。</p></li>
+                <li><span class="ss-num">02</span><b>載入平台規範</b>
+                  <p>依需求判斷後台、前台或 APP，讀完對應的規範檔才動 Figma；RWD 再疊加 breakpoint 與 Variable Mode 的對應規則。</p></li>
+                <li><span class="ss-num">03</span><b>修改模式先讀再動</b>
+                  <p>掃現有節點結構：node-id、既有的 Variable 綁定、是不是 Component Instance、Auto Layout 目前設定。只改需求指定的部分，不整個重建。</p></li>
+                <li><span class="ss-num">04</span><b>執行並同步綁定</b>
+                  <p>Variable ID 從當前檔案已綁定的節點取樣，每個節點建立當下就綁上 token，不留到最後才補。</p></li>
+                <li><span class="ss-num">05</span><b>稽核過了才回報</b>
+                  <p>跑綁定率稽核腳本，未綁定數量全部歸零（或列出有說明的例外）才算完成。</p></li>
+              </ol>
+            </section>
+
+            <section class="ss-col">
+              <h4>驗收標準 <i>六條全過才算完成，缺一不補不回報</i></h4>
+              <ul class="ss-checks">
+                <li><span class="mk">A</span><p><b>Token 綁定</b>顏色、邊框粗細、間距、圓角全部綁對應 Variable；ID 從當前檔案取樣，不 hardcode。</p></li>
+                <li><span class="mk">B</span><p><b>文字樣式</b>所有 TEXT 節點套 Text Style，文字色綁 Color Variable。</p></li>
+                <li><span class="mk">C</span><p><b>元件來源</b>Button／Input／Select／Badge／Icon 一律來自 Library，切 variant 用 setProperties，不 detach。</p></li>
+                <li><span class="mk">D</span><p><b>Auto Layout</b>所有容器套 Auto Layout，FILL sizing 在 appendChild 之後設定，不用絕對定位（overlay 除外）。</p></li>
+                <li><span class="mk">E</span><p><b>修改保護</b>只改需求指定範圍；已有 Variable 綁定的節點用換 variable 的方式改，不直接填色碼。</p></li>
+                <li><span class="mk">F</span><p><b>圖層命名</b>依團隊命名規範，不留 Frame 1、Rectangle 2 這種預設名稱。</p></li>
+              </ul>
+            </section>
+
+            <section class="ss-col">
+              <h4>執行鐵則 <i>這些坑踩過，所以寫進 Skill</i></h4>
+              <ol class="ss-rules">
+                <li><span class="ss-num">01</span><p><b>絕不 hardcode</b>fills、strokes、strokeWeight、textStyle、padding、gap、radius 一律綁 Variable。</p></li>
+                <li><span class="ss-num">02</span><p><b>Variable ID 現場取樣</b>token ID 會因檔案而異，不可沿用記憶中的舊 ID。</p></li>
+                <li><span class="ss-num">03</span><p><b>順序有先後</b>FILL sizing 與 setBoundVariable 都必須在 appendChild 之後才設定。</p></li>
+                <li><span class="ss-num">04</span><p><b>不動 Instance 內部</b>先用 setProperties 換 variant，不直接改子節點的 fill／font；能不 detach 就不 detach。</p></li>
+                <li><span class="ss-num">05</span><p><b>邊改邊驗</b>每改完一個區塊就截圖或讀 metadata 確認，不要全部改完才發現走鐘。</p></li>
+                <li><span class="ss-num">06</span><p><b>找不到 Token 的處理</b>品牌特例保留 hardcode 並在回報中列出；間距沒有精確 token 就取最近的級距。</p></li>
+                <li><span class="ss-num">07</span><p><b>不確定就問</b>設計稿有疑義先問我，不要自己猜。</p></li>
+              </ol>
+            </section>
+          </div>
+          </div>
+
+          <footer class="ss-floor">
+            <span class="ss-k">驗收底線</span>
+            <p>規範檔沒讀完不動 Figma　・　綁定稽核未綁定數量歸零，例外要附說明　・　元件找不到就查 Library，不手繪</p>
+          </footer>
+        </div>
+      </div>
+      <script>
+        (function () {
+          var host = document.currentScript.previousElementSibling;
+          var card = host.querySelector('.ss-card');
+          var wrap = host.querySelector('.ss-scroll');
+          if (!card || !wrap) return;
+          var body = wrap.querySelector('.ss-body');
+          var title = card.getAttribute('data-skill') || '內容規範';
+
+          // 底部漸層：捲到底就淡出
+          function sync() {
+            var atEnd = body.scrollTop + body.clientHeight >= body.scrollHeight - 4;
+            wrap.classList.toggle('at-end', atEnd || body.scrollHeight <= body.clientHeight + 4);
+          }
+          body.addEventListener('scroll', sync, { passive: true });
+          window.addEventListener('resize', sync);
+          sync();
+          setTimeout(sync, 600);   // 字型載入後行高會變，重算一次
+
+          // Lightbox：點卡片放大檢視
+          var lb = null, lastFocus = null;
+          function build() {
+            lb = document.createElement('div');
+            lb.className = 'ss-lb';
+            lb.setAttribute('role', 'dialog');
+            lb.setAttribute('aria-modal', 'true');
+            lb.setAttribute('aria-label', title + ' 內容規範');
+            var bd = document.createElement('div');
+            bd.className = 'ss-lb-bd';
+            var panel = document.createElement('div');
+            panel.className = 'ss-lb-panel';
+            var close = document.createElement('button');
+            close.type = 'button';
+            close.className = 'ss-lb-close';
+            close.setAttribute('aria-label', '關閉');
+            close.innerHTML = '<svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round"><path d="M18 6 6 18M6 6l12 12"/></svg>';
+            var clone = card.cloneNode(true);
+            clone.classList.add('in-lb');
+            clone.removeAttribute('role');
+            clone.removeAttribute('tabindex');
+            clone.removeAttribute('aria-label');
+            panel.appendChild(close);
+            panel.appendChild(clone);
+            lb.appendChild(bd);
+            lb.appendChild(panel);
+            document.body.appendChild(lb);
+            bd.addEventListener('click', hide);
+            close.addEventListener('click', hide);
+          }
+          function show() {
+            if (!lb) build();
+            lastFocus = document.activeElement;
+            lb.classList.add('open');
+            document.body.style.overflow = 'hidden';
+            requestAnimationFrame(function () { lb.classList.add('shown'); });
+            lb.querySelector('.ss-lb-close').focus();
+          }
+          function hide() {
+            if (!lb) return;
+            lb.classList.remove('shown');
+            document.body.style.overflow = '';
+            setTimeout(function () { lb.classList.remove('open'); }, 250);
+            if (lastFocus && lastFocus.focus) lastFocus.focus();
+          }
+          card.addEventListener('click', show);
+          card.addEventListener('keydown', function (e) {
+            if (e.key === 'Enter' || e.key === ' ') { e.preventDefault(); show(); }
+          });
+          document.addEventListener('keydown', function (e) {
+            if (e.key === 'Escape' && lb && lb.classList.contains('open')) hide();
+          });
+        })();
+      </script>
       <div class="aiwf-specs">
         <div class="row skill">
           <span class="k">自定義 Skill</span><span class="bar"></span>

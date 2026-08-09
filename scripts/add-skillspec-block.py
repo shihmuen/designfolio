@@ -1,14 +1,16 @@
 #!/usr/bin/env python3
-# 情境2「自定義 Skill」內容規範卡（design-prd-spec）
-# 內容依 000_Agent/skills/design-prd-spec/{SKILL.md, references/prd-template.md}
-# 與 github.com/shihmuen/public-skills 公開版逐條對照，不自行發揮。
+# 情境2／3「自定義 Skill」內容規範卡
+#   情境2：design-prd-spec  ← 000_Agent/skills/design-prd-spec/{SKILL.md, references/prd-template.md}
+#   情境3：design-execution ← github.com/shihmuen/public-skills/design-execution/SKILL.md
+# 內容逐條對照原始 Skill 檔，不自行發揮。
 #
-# 版面（Molly 08-09 最終指定）：寬度與頁面其他內容同寬（滿版，不內縮 51px）、
-# 固定高度、內容垂直排列並在卡片內捲動（推翻同日稍早「不可滑動」的三欄版）。
-# 表頭與驗收底線固定不動，只有中間內容區捲動；捲軸常駐當作「還有內容」的訊號。
+# 版面（Molly 08-09 定案）：寬度與頁面其他內容同寬（滿版，不內縮 51px）、
+# 固定高度、內容垂直排列並在卡片內捲動；表頭與驗收底線固定，只有中間內容區捲動。
+# macOS 捲軸是隱藏式的，改用底部漸層當「還有內容」的訊號，捲到底淡出。
+# 點卡片（或 Enter／Space）開 Lightbox 放大檢視，內容解除高度限制。
 #
-# 只改 zh 版供 Molly 確認；確認後再處理 en 與情境3。
-# 用法：先 git checkout dist/zh/my-ai-workflow/index.html 還原，再跑這支。
+# 只做 zh；英文版 Molly 指定不上。
+# 用法：先 git checkout <該 html> 還原到未加卡片的版本，再跑這支。
 import pathlib
 
 P = pathlib.Path('/Users/shihmuen/Desktop/portfolio-site/dist/zh/my-ai-workflow/index.html')
@@ -66,8 +68,8 @@ CSS = '''
   .ss-eyebrow { font-size: 14px; font-weight: 500; letter-spacing: .08em; color: rgba(0,0,0,.36); }
   .ss-id { display: flex; align-items: baseline; gap: 10px; }
   .ss-head .aiwf-skillpill { font-size: 18px; }  /* 卡內 pill（Molly 08-09 拍板 18px） */
-  /* 情境2「自定義 Skill」列的 pill 也收到 18px（情境3 維持 22px 未動） */
-  .aiwf-specs .row.skill.prd .aiwf-skillpill { font-size: 18px; }
+  /* 兩個情境的「自定義 Skill」列 pill 一起收到 18px */
+  .aiwf-specs .row.skill .aiwf-skillpill { font-size: 18px; }
   .ss-id .ss-name { font-size: 20px; font-weight: 700; color: var(--ink); letter-spacing: -0.01em; }
   .ss-trigger { display: flex; gap: 8px; align-items: baseline; flex-wrap: wrap; margin-left: auto; }
   .ss-k { flex: 0 0 auto; font-size: 14px; font-weight: 500; color: rgba(0,0,0,.36); line-height: 1.9; }
@@ -123,6 +125,17 @@ CSS = '''
   .ss-chapters .req.must { background: #41332E; color: #F4E3DD; }
   .ss-chapters .req.opt { background: rgba(153,110,94,.2); color: rgba(0,0,0,.5); }
 
+  /* 情境3 的驗收標準 A–F：深色字母徽章，和條列型的規範做出區隔 */
+  .ss-checks { display: flex; flex-direction: column; gap: 9px; }
+  .ss-checks li { display: grid; grid-template-columns: 22px 1fr; gap: 8px; align-content: start; }
+  .ss-checks .mk {
+    font-family: ui-monospace, 'SF Mono', SFMono-Regular, Menlo, monospace;
+    font-size: 11px; font-weight: 600; text-align: center; line-height: 1.9;
+    background: #41332E; color: #F4E3DD; border-radius: 3px;
+  }
+  .ss-checks p { font-size: 14px; font-weight: 500; line-height: 1.5; color: rgba(0,0,0,.55); }
+  .ss-checks b { font-weight: 600; color: var(--ink); margin-right: 6px; }
+
   .ss-rules { display: flex; flex-direction: column; gap: 9px; }
   .ss-rules li { display: grid; grid-template-columns: 26px 1fr; gap: 8px; align-content: start; }
   .ss-rules p { font-size: 14px; font-weight: 500; line-height: 1.5; color: rgba(0,0,0,.55); }
@@ -160,84 +173,14 @@ CSS_560 = '''    /* 手機：表頭與底線本身就吃掉不少高度，卡片
     .aiwf-more { margin-left: 0; }
 '''
 
-BLOCK = '''      <div class="aiwf-skillspec">
-        <div class="ss-card" role="button" tabindex="0" aria-label="放大檢視 design-prd-spec 內容規範">
-          <header class="ss-head">
-            <p class="ss-eyebrow">SKILL 內容規範</p>
-            <div class="ss-id">
-              <span class="aiwf-skillpill">design-prd-spec</span>
-              <span class="ss-name">設計規格文件生成</span>
-            </div>
-            <div class="ss-trigger">
-              <span class="ss-k">觸發</span>
-              <span class="ss-chips">
-                <em>幫我寫設計規格</em><em>寫 PRD</em><em>產出設計 spec</em><em>開給工程師的文件</em>
-              </span>
-            </div>
-          </header>
-
-          <div class="ss-scroll">
-          <div class="ss-body">
-            <section class="ss-col">
-              <h4>執行流程</h4>
-              <ol class="ss-steps">
-                <li><span class="ss-num">01</span><b>資料收集</b>
-                  <p>先問四項必填：功能名稱、需求位置、需求類型、功能概述。選填 Figma 連結、任務單號、負責人、時程。</p></li>
-                <li><span class="ss-num">02</span><b>拆解需求</b>
-                  <p>有 Figma 就直接讀設計稿，按六個維度識別：頁面／區塊清單、元件規格、排序邏輯、互動行為、Edge Case、API 相關。</p></li>
-                <li><span class="ss-num">03</span><b>產出草稿</b>
-                  <p>依模板生成 Markdown 存進文件資料夾，同時在對話中完整輸出讓我先看過。</p></li>
-                <li><span class="ss-num">04</span><b>確認後發佈</b>
-                  <p>我點頭才送出，透過 MCP 建立或更新 Confluence／Notion 頁面。</p></li>
-              </ol>
-            </section>
-
-            <section class="ss-col">
-              <h4>文件模板 <i>v1.1．12 個區塊</i></h4>
-              <ul class="ss-chapters">
-                <li><span class="req must">必填</span>版本記錄</li>
-                <li><span class="req must">必填</span>需求資訊</li>
-                <li><span class="req opt">依需求</span>零　核心名詞說明</li>
-                <li><span class="req must">必填</span>一　功能簡介與設計目標</li>
-                <li><span class="req must">必填</span>二　資訊架構（IA）</li>
-                <li><span class="req must">必填</span>三　頁面／功能區塊規格</li>
-                <li><span class="req opt">依需求</span>四　排序／顯示邏輯</li>
-                <li><span class="req opt">依需求</span>五　狀態機／多狀態規則</li>
-                <li><span class="req opt">依需求</span>六　通知規格</li>
-                <li><span class="req must">必填</span>七　Edge Case 彙整</li>
-                <li><span class="req opt">依需求</span>八　Phase 規劃</li>
-                <li><span class="req opt">依需求</span>九　API Contract</li>
-              </ul>
-            </section>
-
-            <section class="ss-col">
-              <h4>寫作規範 <i>寫得對，也要寫得能被開發直接用</i></h4>
-              <ol class="ss-rules">
-                <li><span class="ss-num">01</span><p><b>表格優先</b>元件規格、Edge Case、API 決策一律用表格，不寫成散文。</p></li>
-                <li><span class="ss-num">02</span><p><b>欄位固定三欄</b>區塊名稱／內容與規格／備註，備註放的是規則說明，不是廢話。</p></li>
-                <li><span class="ss-num">03</span><p><b>排序要寫 fallback 鏈</b>1 → 2 → 3 用縮排表示層級，含無資料時的邊界處理。</p></li>
-                <li><span class="ss-num">04</span><p><b>Edge Case 獨立成表</b>情境／行為兩欄，不混進元件規格裡。</p></li>
-                <li><span class="ss-num">05</span><p><b>用語要精準</b>隱藏寫 Hide；顯示量寫「預設 N 筆，click 再載入 N 筆」；搜尋要交代觸發方式、範圍與 match 邏輯。</p></li>
-                <li><span class="ss-num">06</span><p><b>API 只記決策</b>寫產品層面確認的規格（分頁機制、資料來源、搜尋方式），技術實作留給 backend 收斂。</p></li>
-                <li><span class="ss-num">07</span><p><b>語言</b>繁體中文為主，技術名詞保留英文（Tab、CTA、Banner、API、endpoint）。</p></li>
-              </ol>
-            </section>
-          </div>
-          </div>
-
-          <footer class="ss-floor">
-            <span class="ss-k">驗收底線</span>
-            <p>有 Figma 一定先讀設計稿，不憑空假設　・　Edge Case 至少涵蓋空資料、搜尋無結果、錯誤狀態　・　有排序邏輯就要列出完整 fallback 鏈</p>
-          </footer>
-        </div>
-      </div>
-      <script>
+JS = '''      <script>
         (function () {
           var host = document.currentScript.previousElementSibling;
           var card = host.querySelector('.ss-card');
           var wrap = host.querySelector('.ss-scroll');
           if (!card || !wrap) return;
           var body = wrap.querySelector('.ss-body');
+          var title = card.getAttribute('data-skill') || '內容規範';
 
           // 底部漸層：捲到底就淡出
           function sync() {
@@ -256,7 +199,7 @@ BLOCK = '''      <div class="aiwf-skillspec">
             lb.className = 'ss-lb';
             lb.setAttribute('role', 'dialog');
             lb.setAttribute('aria-modal', 'true');
-            lb.setAttribute('aria-label', 'design-prd-spec 內容規範');
+            lb.setAttribute('aria-label', title + ' 內容規範');
             var bd = document.createElement('div');
             bd.className = 'ss-lb-bd';
             var panel = document.createElement('div');
@@ -304,7 +247,142 @@ BLOCK = '''      <div class="aiwf-skillspec">
         })();
       </script>'''
 
-# 1. 插入 CSS（接在 .aiwf-figure .ph 規則之後）
+
+def block(slug, name, chips, sections, floor):
+    chip_html = ''.join('<em>%s</em>' % c for c in chips)
+    return '''      <div class="aiwf-skillspec">
+        <div class="ss-card" role="button" tabindex="0" data-skill="%s" aria-label="放大檢視 %s 內容規範">
+          <header class="ss-head">
+            <p class="ss-eyebrow">SKILL 內容規範</p>
+            <div class="ss-id">
+              <span class="aiwf-skillpill">%s</span>
+              <span class="ss-name">%s</span>
+            </div>
+            <div class="ss-trigger">
+              <span class="ss-k">觸發</span>
+              <span class="ss-chips">
+                %s
+              </span>
+            </div>
+          </header>
+
+          <div class="ss-scroll">
+          <div class="ss-body">
+%s
+          </div>
+          </div>
+
+          <footer class="ss-floor">
+            <span class="ss-k">驗收底線</span>
+            <p>%s</p>
+          </footer>
+        </div>
+      </div>
+%s''' % (slug, slug, slug, name, chip_html, sections, floor, JS)
+
+
+# ---------------- 情境2：design-prd-spec ----------------
+SEC2 = '''            <section class="ss-col">
+              <h4>執行流程</h4>
+              <ol class="ss-steps">
+                <li><span class="ss-num">01</span><b>資料收集</b>
+                  <p>先問四項必填：功能名稱、需求位置、需求類型、功能概述。選填 Figma 連結、任務單號、負責人、時程。</p></li>
+                <li><span class="ss-num">02</span><b>拆解需求</b>
+                  <p>有 Figma 就直接讀設計稿，按六個維度識別：頁面／區塊清單、元件規格、排序邏輯、互動行為、Edge Case、API 相關。</p></li>
+                <li><span class="ss-num">03</span><b>產出草稿</b>
+                  <p>依模板生成 Markdown 存進文件資料夾，同時在對話中完整輸出讓我先看過。</p></li>
+                <li><span class="ss-num">04</span><b>確認後發佈</b>
+                  <p>我點頭才送出，透過 MCP 建立或更新 Confluence／Notion 頁面。</p></li>
+              </ol>
+            </section>
+
+            <section class="ss-col">
+              <h4>文件模板 <i>v1.1．12 個區塊</i></h4>
+              <ul class="ss-chapters">
+                <li><span class="req must">必填</span>版本記錄</li>
+                <li><span class="req must">必填</span>需求資訊</li>
+                <li><span class="req opt">依需求</span>零　核心名詞說明</li>
+                <li><span class="req must">必填</span>一　功能簡介與設計目標</li>
+                <li><span class="req must">必填</span>二　資訊架構（IA）</li>
+                <li><span class="req must">必填</span>三　頁面／功能區塊規格</li>
+                <li><span class="req opt">依需求</span>四　排序／顯示邏輯</li>
+                <li><span class="req opt">依需求</span>五　狀態機／多狀態規則</li>
+                <li><span class="req opt">依需求</span>六　通知規格</li>
+                <li><span class="req must">必填</span>七　Edge Case 彙整</li>
+                <li><span class="req opt">依需求</span>八　Phase 規劃</li>
+                <li><span class="req opt">依需求</span>九　API Contract</li>
+              </ul>
+            </section>
+
+            <section class="ss-col">
+              <h4>寫作規範 <i>寫得對，也要寫得能被開發直接用</i></h4>
+              <ol class="ss-rules">
+                <li><span class="ss-num">01</span><p><b>表格優先</b>元件規格、Edge Case、API 決策一律用表格，不寫成散文。</p></li>
+                <li><span class="ss-num">02</span><p><b>欄位固定三欄</b>區塊名稱／內容與規格／備註，備註放的是規則說明，不是廢話。</p></li>
+                <li><span class="ss-num">03</span><p><b>排序要寫 fallback 鏈</b>1 → 2 → 3 用縮排表示層級，含無資料時的邊界處理。</p></li>
+                <li><span class="ss-num">04</span><p><b>Edge Case 獨立成表</b>情境／行為兩欄，不混進元件規格裡。</p></li>
+                <li><span class="ss-num">05</span><p><b>用語要精準</b>隱藏寫 Hide；顯示量寫「預設 N 筆，click 再載入 N 筆」；搜尋要交代觸發方式、範圍與 match 邏輯。</p></li>
+                <li><span class="ss-num">06</span><p><b>API 只記決策</b>寫產品層面確認的規格（分頁機制、資料來源、搜尋方式），技術實作留給 backend 收斂。</p></li>
+                <li><span class="ss-num">07</span><p><b>語言</b>繁體中文為主，技術名詞保留英文（Tab、CTA、Banner、API、endpoint）。</p></li>
+              </ol>
+            </section>'''
+
+BLOCK2 = block(
+    'design-prd-spec', '設計規格文件生成',
+    ['幫我寫設計規格', '寫 PRD', '產出設計 spec', '開給工程師的文件'],
+    SEC2,
+    '有 Figma 一定先讀設計稿，不憑空假設　・　Edge Case 至少涵蓋空資料、搜尋無結果、錯誤狀態　・　有排序邏輯就要列出完整 fallback 鏈')
+
+# ---------------- 情境3：design-execution ----------------
+SEC3 = '''            <section class="ss-col">
+              <h4>執行流程</h4>
+              <ol class="ss-steps">
+                <li><span class="ss-num">01</span><b>判斷模式</b>
+                  <p>新建／修改現有／RWD 多尺寸三選一。不確定時看有沒有附 Figma node-id：有就是修改模式。</p></li>
+                <li><span class="ss-num">02</span><b>載入平台規範</b>
+                  <p>依需求判斷後台、前台或 APP，讀完對應的規範檔才動 Figma；RWD 再疊加 breakpoint 與 Variable Mode 的對應規則。</p></li>
+                <li><span class="ss-num">03</span><b>修改模式先讀再動</b>
+                  <p>掃現有節點結構：node-id、既有的 Variable 綁定、是不是 Component Instance、Auto Layout 目前設定。只改需求指定的部分，不整個重建。</p></li>
+                <li><span class="ss-num">04</span><b>執行並同步綁定</b>
+                  <p>Variable ID 從當前檔案已綁定的節點取樣，每個節點建立當下就綁上 token，不留到最後才補。</p></li>
+                <li><span class="ss-num">05</span><b>稽核過了才回報</b>
+                  <p>跑綁定率稽核腳本，未綁定數量全部歸零（或列出有說明的例外）才算完成。</p></li>
+              </ol>
+            </section>
+
+            <section class="ss-col">
+              <h4>驗收標準 <i>六條全過才算完成，缺一不補不回報</i></h4>
+              <ul class="ss-checks">
+                <li><span class="mk">A</span><p><b>Token 綁定</b>顏色、邊框粗細、間距、圓角全部綁對應 Variable；ID 從當前檔案取樣，不 hardcode。</p></li>
+                <li><span class="mk">B</span><p><b>文字樣式</b>所有 TEXT 節點套 Text Style，文字色綁 Color Variable。</p></li>
+                <li><span class="mk">C</span><p><b>元件來源</b>Button／Input／Select／Badge／Icon 一律來自 Library，切 variant 用 setProperties，不 detach。</p></li>
+                <li><span class="mk">D</span><p><b>Auto Layout</b>所有容器套 Auto Layout，FILL sizing 在 appendChild 之後設定，不用絕對定位（overlay 除外）。</p></li>
+                <li><span class="mk">E</span><p><b>修改保護</b>只改需求指定範圍；已有 Variable 綁定的節點用換 variable 的方式改，不直接填色碼。</p></li>
+                <li><span class="mk">F</span><p><b>圖層命名</b>依團隊命名規範，不留 Frame 1、Rectangle 2 這種預設名稱。</p></li>
+              </ul>
+            </section>
+
+            <section class="ss-col">
+              <h4>執行鐵則 <i>這些坑踩過，所以寫進 Skill</i></h4>
+              <ol class="ss-rules">
+                <li><span class="ss-num">01</span><p><b>絕不 hardcode</b>fills、strokes、strokeWeight、textStyle、padding、gap、radius 一律綁 Variable。</p></li>
+                <li><span class="ss-num">02</span><p><b>Variable ID 現場取樣</b>token ID 會因檔案而異，不可沿用記憶中的舊 ID。</p></li>
+                <li><span class="ss-num">03</span><p><b>順序有先後</b>FILL sizing 與 setBoundVariable 都必須在 appendChild 之後才設定。</p></li>
+                <li><span class="ss-num">04</span><p><b>不動 Instance 內部</b>先用 setProperties 換 variant，不直接改子節點的 fill／font；能不 detach 就不 detach。</p></li>
+                <li><span class="ss-num">05</span><p><b>邊改邊驗</b>每改完一個區塊就截圖或讀 metadata 確認，不要全部改完才發現走鐘。</p></li>
+                <li><span class="ss-num">06</span><p><b>找不到 Token 的處理</b>品牌特例保留 hardcode 並在回報中列出；間距沒有精確 token 就取最近的級距。</p></li>
+                <li><span class="ss-num">07</span><p><b>不確定就問</b>設計稿有疑義先問我，不要自己猜。</p></li>
+              </ol>
+            </section>'''
+
+BLOCK3 = block(
+    'design-execution', '設計稿執行',
+    ['執行設計稿', '修改設計稿', '做 RWD 版本', '符合驗收標準'],
+    SEC3,
+    '規範檔沒讀完不動 Figma　・　綁定稽核未綁定數量歸零，例外要附說明　・　元件找不到就查 Library，不手繪')
+
+# ---------------- 套用 ----------------
+# 1. CSS（接在 .aiwf-figure .ph 規則之後）
 anchor = """    aspect-ratio: 824 / 424; background: #DCCCC7; border-radius: 8px;
   }
 """
@@ -320,28 +398,24 @@ a560 = "    .aiwf-specs .v { font-size: 18px; }\n"
 assert s.count(a560) == 1
 s = s.replace(a560, a560 + CSS_560)
 
-# 3. 用規範卡取代情境2 的灰色 placeholder
+# 3. 取代情境2／3 的灰色 placeholder
 ph2 = '      <div class="aiwf-figure"><div class="ph" data-slot="design-docs-demo"><!-- 素材待補：Design Docs Demo --></div></div>'
 assert s.count(ph2) == 1
-s = s.replace(ph2, BLOCK)
+s = s.replace(ph2, BLOCK2)
+
+ph3 = '      <div class="aiwf-figure"><div class="ph" data-slot="design-system-demo"><!-- 素材待補：Design System Demo --></div></div>'
+assert s.count(ph3) == 1
+s = s.replace(ph3, BLOCK3)
 
 # 4. 進場動畫納入
 sel = "'.sc-head', '.aiwf-figure', '.aiwf-specs .row', '.aiwf-prompts .bubble',"
 assert s.count(sel) == 1
 s = s.replace(sel, "'.sc-head', '.aiwf-figure', '.aiwf-skillspec', '.aiwf-specs .row', '.aiwf-prompts .bubble',")
 
-P.write_text(s)
-print('zh/my-ai-workflow: skill spec block inserted (full-width, 3-col)')
-
-# 5. 情境2「自定義 Skill」列加 .prd（pill 18px）＋ 卡片 hover 納入 reduced-motion 停用
-old_row = '''        <div class="row skill">
-          <span class="k">自定義 Skill</span><span class="bar"></span>
-          <span class="aiwf-skillpill">design-prd-spec</span>'''
-s2 = P.read_text()
-assert s2.count(old_row) == 1
-s2 = s2.replace(old_row, old_row.replace('class="row skill"', 'class="row skill prd"'))
+# 5. 卡片 hover／Lightbox 位移納入 reduced-motion 停用
 old_rm = "    .aiwf-next a:hover .thumb, .aiwf-prompts .bubble:hover { transform: none; }"
-assert s2.count(old_rm) == 1
-s2 = s2.replace(old_rm, "    .aiwf-next a:hover .thumb, .aiwf-prompts .bubble:hover, .ss-card:hover { transform: none; }\n    .ss-lb-panel { transition: none; }")
-P.write_text(s2)
-print('row class + reduced-motion applied')
+assert s.count(old_rm) == 1
+s = s.replace(old_rm, "    .aiwf-next a:hover .thumb, .aiwf-prompts .bubble:hover, .ss-card:hover { transform: none; }\n    .ss-lb-panel { transition: none; }")
+
+P.write_text(s)
+print('zh/my-ai-workflow: 情境2 + 情境3 skill spec cards inserted')
