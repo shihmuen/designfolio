@@ -22,7 +22,7 @@ CSS = '''
     overflow: hidden; height: 560px; display: flex; flex-direction: column;
     transition: transform .4s cubic-bezier(.16,1,.3,1), box-shadow .4s;
   }
-  .ss-card:hover { transform: translateY(-4px); box-shadow: 0 10px 24px rgba(153,110,94,.12); }
+  .ss-card:hover { transform: scale(1.1); box-shadow: 0 10px 24px rgba(153,110,94,.12); }
 
   .ss-head {
     flex: 0 0 auto; padding: 20px 28px 18px; border-bottom: 1px solid rgba(0,0,0,.08);
@@ -106,13 +106,19 @@ CSS_900 = '''    .ss-card { height: 520px; }
 
 CSS_560 = '''    /* 手機：表頭與底線本身就吃掉不少高度，卡片拉高並壓縮兩端，
        才留得下可用的捲動視窗（440px 時只剩 70px，等於不能讀） */
-    .ss-card { height: 560px; }
-    .ss-head { padding: 16px 20px 14px; gap: 10px 14px; }
+    .ss-card { height: 640px; }
+    .ss-head { padding: 16px 20px 14px; gap: 10px 12px; }
+    .ss-eyebrow { font-size: 13px; }
+    .ss-head .aiwf-skillpill, .ss-id .ss-name { font-size: 16px; }
     .ss-col { padding-left: 20px; padding-right: 20px; }
     .ss-floor { padding: 12px 20px 14px; }
-    .ss-id .ss-name { font-size: 18px; }
     .ss-chips em { font-size: 13px; padding: 2px 8px; }
     .ss-floor p { font-size: 13px; line-height: 1.5; }
+    /* 跑版修正：.row.skill 原本 align-items:center，單欄後變成水平置中，
+       與其他靠左的 row 不一致（情境2／3 同樣受惠） */
+    .aiwf-specs .row.skill { flex-direction: row; flex-wrap: wrap; align-items: center; gap: 8px 10px; }
+    .aiwf-specs .row.skill .k { flex: 0 0 100%; }
+    .aiwf-more { margin-left: 0; }
 '''
 
 BLOCK = '''      <div class="aiwf-skillspec">
