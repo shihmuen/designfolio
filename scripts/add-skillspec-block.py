@@ -3,9 +3,9 @@
 # 內容依 000_Agent/skills/design-prd-spec/{SKILL.md, references/prd-template.md}
 # 與 github.com/shihmuen/public-skills 公開版逐條對照，不自行發揮。
 #
-# 版面（Molly 08-09 指定）：寬度與頁面其他內容同寬（滿版，不內縮 51px）、
-# 高度盡量壓短、且「不靠內部捲動」達成 —— 所以改三欄規格表：
-# 執行流程 / 文件模板 / 寫作規範 並排，驗收底線橫跨底部。
+# 版面（Molly 08-09 最終指定）：寬度與頁面其他內容同寬（滿版，不內縮 51px）、
+# 固定高度、內容垂直排列並在卡片內捲動（推翻同日稍早「不可滑動」的三欄版）。
+# 表頭與驗收底線固定不動，只有中間內容區捲動；捲軸常駐當作「還有內容」的訊號。
 #
 # 只改 zh 版供 Molly 確認；確認後再處理 en 與情境3。
 # 用法：先 git checkout dist/zh/my-ai-workflow/index.html 還原，再跑這支。
@@ -15,21 +15,24 @@ P = pathlib.Path('/Users/shihmuen/Desktop/portfolio-site/dist/zh/my-ai-workflow/
 s = P.read_text()
 
 CSS = '''
-  /* 自定義 Skill 內容規範卡（情境2／3）：滿版寬度、三欄、無內部捲動 */
+  /* 自定義 Skill 內容規範卡（情境2／3）：滿版寬度、固定高度、內容垂直排列可捲動 */
   .aiwf-skillspec { width: 100%; }
-  .ss-card { background: #FEF3F0; border: 1px solid rgba(0,0,0,.1); border-radius: 16px; overflow: hidden; }
+  .ss-card {
+    background: #FEF3F0; border: 1px solid rgba(0,0,0,.1); border-radius: 16px;
+    overflow: hidden; height: 560px; display: flex; flex-direction: column;
+    transition: transform .4s cubic-bezier(.16,1,.3,1), box-shadow .4s;
+  }
+  .ss-card:hover { transform: translateY(-4px); box-shadow: 0 10px 24px rgba(153,110,94,.12); }
+
   .ss-head {
-    padding: 20px 28px 18px; border-bottom: 1px solid rgba(0,0,0,.08);
+    flex: 0 0 auto; padding: 20px 28px 18px; border-bottom: 1px solid rgba(0,0,0,.08);
     display: flex; align-items: baseline; gap: 16px 20px; flex-wrap: wrap;
   }
   .ss-eyebrow { font-size: 14px; font-weight: 500; letter-spacing: .08em; color: rgba(0,0,0,.36); }
   .ss-id { display: flex; align-items: baseline; gap: 10px; }
   .ss-head .aiwf-skillpill { font-size: 18px; }  /* 卡內 pill（Molly 08-09 拍板 18px） */
-  /* 情境2「自定義 Skill」列的 pill 也收到 18px（Molly 08-09；情境3 維持 22px 未動） */
+  /* 情境2「自定義 Skill」列的 pill 也收到 18px（情境3 維持 22px 未動） */
   .aiwf-specs .row.skill.prd .aiwf-skillpill { font-size: 18px; }
-  /* hover：沿用同區塊 prompt bubble 的原生參數 */
-  .ss-card { transition: transform .4s cubic-bezier(.16,1,.3,1), box-shadow .4s; }
-  .ss-card:hover { transform: translateY(-4px); box-shadow: 0 10px 24px rgba(153,110,94,.12); }
   .ss-id .ss-name { font-size: 20px; font-weight: 700; color: var(--ink); letter-spacing: -0.01em; }
   .ss-trigger { display: flex; gap: 8px; align-items: baseline; flex-wrap: wrap; margin-left: auto; }
   .ss-k { flex: 0 0 auto; font-size: 14px; font-weight: 500; color: rgba(0,0,0,.36); line-height: 1.9; }
@@ -39,9 +42,28 @@ CSS = '''
     background: rgba(153,110,94,.13); border-radius: 100px; padding: 3px 10px; line-height: 1.4;
   }
 
-  .ss-body { display: grid; grid-template-columns: 1.05fr 0.85fr 1.3fr; align-items: stretch; }
-  .ss-col { padding: 20px 28px 24px; min-width: 0; }
-  .ss-col + .ss-col { border-left: 1px solid rgba(0,0,0,.08); }
+  /* 內容區：唯一會捲動的地方。macOS 的捲軸是隱藏式的（量測 gutter=0），
+     所以另外用底部漸層當「下面還有」的訊號，捲到底自動淡出 */
+  .ss-scroll { position: relative; flex: 1 1 auto; min-height: 0; display: flex; }
+  .ss-scroll::after {
+    content: ''; position: absolute; left: 0; right: 0; bottom: 0; height: 52px;
+    pointer-events: none; opacity: 1; transition: opacity .25s ease;
+    background: linear-gradient(to bottom, rgba(254,243,240,0) 0%, rgba(254,243,240,.92) 78%, #FEF3F0 100%);
+  }
+  .ss-scroll.at-end::after { opacity: 0; }
+  .ss-body { flex: 1 1 auto; min-width: 0; overflow-y: auto; overscroll-behavior: contain; }
+  /* 不能寫 scrollbar-width／scrollbar-color：一旦指定，Chrome 會忽略下面的
+     ::-webkit-scrollbar 自訂樣式，落回 macOS 的隱藏式捲軸，等於沒有捲動訊號 */
+  .ss-body::-webkit-scrollbar { width: 12px; }
+  .ss-body::-webkit-scrollbar-track { background: rgba(153,110,94,.07); }
+  .ss-body::-webkit-scrollbar-thumb {
+    background: rgba(153,110,94,.34); border-radius: 100px; border: 3px solid #FEF3F0;
+  }
+  .ss-body::-webkit-scrollbar-thumb:hover { background: rgba(153,110,94,.55); }
+
+  .ss-col { padding: 22px 28px 24px; }
+  .ss-col + .ss-col { border-top: 1px solid rgba(0,0,0,.08); }
+  .ss-col > * { max-width: 900px; }   /* 滿版下限制行長，維持可讀的字行寬度 */
   .ss-col h4 {
     font-size: 16px; font-weight: 700; color: var(--ink); letter-spacing: -0.01em;
     margin-bottom: 14px; display: flex; align-items: baseline; gap: 8px;
@@ -72,20 +94,25 @@ CSS = '''
   .ss-rules b { font-weight: 600; color: var(--ink); margin-right: 6px; }
 
   .ss-floor {
-    padding: 14px 28px 16px; border-top: 1px solid rgba(0,0,0,.08);
+    flex: 0 0 auto; padding: 14px 28px 16px; border-top: 1px solid rgba(0,0,0,.08);
     background: rgba(153,110,94,.07); display: flex; gap: 12px; align-items: baseline; flex-wrap: wrap;
   }
   .ss-floor p { flex: 1; min-width: 260px; font-size: 14px; font-weight: 500; line-height: 1.55; color: rgba(0,0,0,.55); }
 '''
 
-CSS_900 = '''    .ss-body { grid-template-columns: 1fr; }
-    .ss-col + .ss-col { border-left: none; border-top: 1px solid rgba(0,0,0,.08); }
+CSS_900 = '''    .ss-card { height: 520px; }
     .ss-trigger { margin-left: 0; }
 '''
 
-CSS_560 = '''    .ss-head, .ss-col { padding-left: 20px; padding-right: 20px; }
-    .ss-floor { padding-left: 20px; padding-right: 20px; }
+CSS_560 = '''    /* 手機：表頭與底線本身就吃掉不少高度，卡片拉高並壓縮兩端，
+       才留得下可用的捲動視窗（440px 時只剩 70px，等於不能讀） */
+    .ss-card { height: 560px; }
+    .ss-head { padding: 16px 20px 14px; gap: 10px 14px; }
+    .ss-col { padding-left: 20px; padding-right: 20px; }
+    .ss-floor { padding: 12px 20px 14px; }
     .ss-id .ss-name { font-size: 18px; }
+    .ss-chips em { font-size: 13px; padding: 2px 8px; }
+    .ss-floor p { font-size: 13px; line-height: 1.5; }
 '''
 
 BLOCK = '''      <div class="aiwf-skillspec">
@@ -104,6 +131,7 @@ BLOCK = '''      <div class="aiwf-skillspec">
             </div>
           </header>
 
+          <div class="ss-scroll">
           <div class="ss-body">
             <section class="ss-col">
               <h4>執行流程</h4>
@@ -150,13 +178,29 @@ BLOCK = '''      <div class="aiwf-skillspec">
               </ol>
             </section>
           </div>
+          </div>
 
           <footer class="ss-floor">
             <span class="ss-k">驗收底線</span>
             <p>有 Figma 一定先讀設計稿，不憑空假設　・　Edge Case 至少涵蓋空資料、搜尋無結果、錯誤狀態　・　有排序邏輯就要列出完整 fallback 鏈</p>
           </footer>
         </div>
-      </div>'''
+      </div>
+      <script>
+        (function () {
+          var wrap = document.currentScript.previousElementSibling.querySelector('.ss-scroll');
+          if (!wrap) return;
+          var body = wrap.querySelector('.ss-body');
+          function sync() {
+            var atEnd = body.scrollTop + body.clientHeight >= body.scrollHeight - 4;
+            wrap.classList.toggle('at-end', atEnd || body.scrollHeight <= body.clientHeight + 4);
+          }
+          body.addEventListener('scroll', sync, { passive: true });
+          window.addEventListener('resize', sync);
+          sync();
+          setTimeout(sync, 600);   // 字型載入後行高會變，重算一次
+        })();
+      </script>'''
 
 # 1. 插入 CSS（接在 .aiwf-figure .ph 規則之後）
 anchor = """    aspect-ratio: 824 / 424; background: #DCCCC7; border-radius: 8px;
