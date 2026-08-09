@@ -22,7 +22,42 @@ CSS = '''
     overflow: hidden; height: 560px; display: flex; flex-direction: column;
     transition: transform .4s cubic-bezier(.16,1,.3,1), box-shadow .4s;
   }
+  .ss-card { cursor: zoom-in; }
   .ss-card:hover { transform: scale(1.1); box-shadow: 0 10px 24px rgba(153,110,94,.12); }
+  .ss-card:focus-visible { outline: 2px solid rgba(153,110,94,.9); outline-offset: 3px; }
+
+  /* Lightbox：點卡片放大檢視，內容不再受固定高度限制 */
+  .ss-lb { position: fixed; inset: 0; z-index: 2147483000; display: none; }
+  .ss-lb.open { display: flex; align-items: center; justify-content: center; padding: 40px 24px; }
+  .ss-lb-bd {
+    position: absolute; inset: 0; background: rgba(65,51,46,.55);
+    -webkit-backdrop-filter: blur(3px); backdrop-filter: blur(3px);
+    opacity: 0; transition: opacity .25s ease;
+  }
+  .ss-lb.shown .ss-lb-bd { opacity: 1; }
+  .ss-lb-panel {
+    position: relative; width: min(980px, 100%); max-height: 88vh; overflow-y: auto;
+    background: #FEF3F0; border: 1px solid rgba(0,0,0,.1); border-radius: 16px;
+    box-shadow: 0 24px 60px rgba(65,51,46,.28);
+    opacity: 0; transform: scale(.96);
+    transition: opacity .25s ease, transform .3s cubic-bezier(.16,1,.3,1);
+  }
+  .ss-lb.shown .ss-lb-panel { opacity: 1; transform: none; }
+  .ss-lb-close {
+    position: absolute; top: 12px; right: 12px; z-index: 3; width: 36px; height: 36px;
+    display: flex; align-items: center; justify-content: center; padding: 0;
+    border: none; border-radius: 100px; background: rgba(65,51,46,.08); cursor: pointer;
+    color: rgba(0,0,0,.6); transition: background .2s ease;
+  }
+  .ss-lb-close:hover { background: rgba(65,51,46,.16); }
+  /* 放大檢視裡：解除固定高度與內部捲動，改由 panel 整體捲動 */
+  .ss-card.in-lb { height: auto; border: none; border-radius: 0; background: transparent; cursor: default; }
+  .ss-card.in-lb:hover { transform: none; box-shadow: none; }
+  .ss-card.in-lb .ss-scroll { display: block; }
+  .ss-card.in-lb .ss-scroll::after { display: none; }
+  .ss-card.in-lb .ss-body { overflow: visible; }
+  .ss-card.in-lb .ss-head { padding-right: 60px; }
+  .ss-card.in-lb .ss-trigger { margin-left: 0; }  /* panel 較窄會折行，靠右會看起來斷開 */
 
   .ss-head {
     flex: 0 0 auto; padding: 20px 28px 18px; border-bottom: 1px solid rgba(0,0,0,.08);
@@ -122,7 +157,7 @@ CSS_560 = '''    /* 手機：表頭與底線本身就吃掉不少高度，卡片
 '''
 
 BLOCK = '''      <div class="aiwf-skillspec">
-        <div class="ss-card">
+        <div class="ss-card" role="button" tabindex="0" aria-label="放大檢視 design-prd-spec 內容規範">
           <header class="ss-head">
             <p class="ss-eyebrow">SKILL 內容規範</p>
             <div class="ss-id">
@@ -194,9 +229,13 @@ BLOCK = '''      <div class="aiwf-skillspec">
       </div>
       <script>
         (function () {
-          var wrap = document.currentScript.previousElementSibling.querySelector('.ss-scroll');
-          if (!wrap) return;
+          var host = document.currentScript.previousElementSibling;
+          var card = host.querySelector('.ss-card');
+          var wrap = host.querySelector('.ss-scroll');
+          if (!card || !wrap) return;
           var body = wrap.querySelector('.ss-body');
+
+          // 底部漸層：捲到底就淡出
           function sync() {
             var atEnd = body.scrollTop + body.clientHeight >= body.scrollHeight - 4;
             wrap.classList.toggle('at-end', atEnd || body.scrollHeight <= body.clientHeight + 4);
@@ -205,6 +244,59 @@ BLOCK = '''      <div class="aiwf-skillspec">
           window.addEventListener('resize', sync);
           sync();
           setTimeout(sync, 600);   // 字型載入後行高會變，重算一次
+
+          // Lightbox：點卡片放大檢視
+          var lb = null, lastFocus = null;
+          function build() {
+            lb = document.createElement('div');
+            lb.className = 'ss-lb';
+            lb.setAttribute('role', 'dialog');
+            lb.setAttribute('aria-modal', 'true');
+            lb.setAttribute('aria-label', 'design-prd-spec 內容規範');
+            var bd = document.createElement('div');
+            bd.className = 'ss-lb-bd';
+            var panel = document.createElement('div');
+            panel.className = 'ss-lb-panel';
+            var close = document.createElement('button');
+            close.type = 'button';
+            close.className = 'ss-lb-close';
+            close.setAttribute('aria-label', '關閉');
+            close.innerHTML = '<svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round"><path d="M18 6 6 18M6 6l12 12"/></svg>';
+            var clone = card.cloneNode(true);
+            clone.classList.add('in-lb');
+            clone.removeAttribute('role');
+            clone.removeAttribute('tabindex');
+            clone.removeAttribute('aria-label');
+            panel.appendChild(close);
+            panel.appendChild(clone);
+            lb.appendChild(bd);
+            lb.appendChild(panel);
+            document.body.appendChild(lb);
+            bd.addEventListener('click', hide);
+            close.addEventListener('click', hide);
+          }
+          function show() {
+            if (!lb) build();
+            lastFocus = document.activeElement;
+            lb.classList.add('open');
+            document.body.style.overflow = 'hidden';
+            requestAnimationFrame(function () { lb.classList.add('shown'); });
+            lb.querySelector('.ss-lb-close').focus();
+          }
+          function hide() {
+            if (!lb) return;
+            lb.classList.remove('shown');
+            document.body.style.overflow = '';
+            setTimeout(function () { lb.classList.remove('open'); }, 250);
+            if (lastFocus && lastFocus.focus) lastFocus.focus();
+          }
+          card.addEventListener('click', show);
+          card.addEventListener('keydown', function (e) {
+            if (e.key === 'Enter' || e.key === ' ') { e.preventDefault(); show(); }
+          });
+          document.addEventListener('keydown', function (e) {
+            if (e.key === 'Escape' && lb && lb.classList.contains('open')) hide();
+          });
         })();
       </script>'''
 
@@ -246,6 +338,6 @@ assert s2.count(old_row) == 1
 s2 = s2.replace(old_row, old_row.replace('class="row skill"', 'class="row skill prd"'))
 old_rm = "    .aiwf-next a:hover .thumb, .aiwf-prompts .bubble:hover { transform: none; }"
 assert s2.count(old_rm) == 1
-s2 = s2.replace(old_rm, "    .aiwf-next a:hover .thumb, .aiwf-prompts .bubble:hover, .ss-card:hover { transform: none; }")
+s2 = s2.replace(old_rm, "    .aiwf-next a:hover .thumb, .aiwf-prompts .bubble:hover, .ss-card:hover { transform: none; }\n    .ss-lb-panel { transition: none; }")
 P.write_text(s2)
 print('row class + reduced-motion applied')
