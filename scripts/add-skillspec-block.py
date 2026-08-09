@@ -25,6 +25,11 @@ CSS = '''
   .ss-eyebrow { font-size: 14px; font-weight: 500; letter-spacing: .08em; color: rgba(0,0,0,.36); }
   .ss-id { display: flex; align-items: baseline; gap: 10px; }
   .ss-head .aiwf-skillpill { font-size: 18px; }  /* 卡內 pill（Molly 08-09 拍板 18px） */
+  /* 情境2「自定義 Skill」列的 pill 也收到 18px（Molly 08-09；情境3 維持 22px 未動） */
+  .aiwf-specs .row.skill.prd .aiwf-skillpill { font-size: 18px; }
+  /* hover：沿用同區塊 prompt bubble 的原生參數 */
+  .ss-card { transition: transform .4s cubic-bezier(.16,1,.3,1), box-shadow .4s; }
+  .ss-card:hover { transform: translateY(-4px); box-shadow: 0 10px 24px rgba(153,110,94,.12); }
   .ss-id .ss-name { font-size: 20px; font-weight: 700; color: var(--ink); letter-spacing: -0.01em; }
   .ss-trigger { display: flex; gap: 8px; align-items: baseline; flex-wrap: wrap; margin-left: auto; }
   .ss-k { flex: 0 0 auto; font-size: 14px; font-weight: 500; color: rgba(0,0,0,.36); line-height: 1.9; }
@@ -181,3 +186,16 @@ s = s.replace(sel, "'.sc-head', '.aiwf-figure', '.aiwf-skillspec', '.aiwf-specs 
 
 P.write_text(s)
 print('zh/my-ai-workflow: skill spec block inserted (full-width, 3-col)')
+
+# 5. 情境2「自定義 Skill」列加 .prd（pill 18px）＋ 卡片 hover 納入 reduced-motion 停用
+old_row = '''        <div class="row skill">
+          <span class="k">自定義 Skill</span><span class="bar"></span>
+          <span class="aiwf-skillpill">design-prd-spec</span>'''
+s2 = P.read_text()
+assert s2.count(old_row) == 1
+s2 = s2.replace(old_row, old_row.replace('class="row skill"', 'class="row skill prd"'))
+old_rm = "    .aiwf-next a:hover .thumb, .aiwf-prompts .bubble:hover { transform: none; }"
+assert s2.count(old_rm) == 1
+s2 = s2.replace(old_rm, "    .aiwf-next a:hover .thumb, .aiwf-prompts .bubble:hover, .ss-card:hover { transform: none; }")
+P.write_text(s2)
+print('row class + reduced-motion applied')
