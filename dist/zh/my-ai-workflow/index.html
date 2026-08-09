@@ -261,7 +261,7 @@
     transition: transform .4s cubic-bezier(.16,1,.3,1), box-shadow .4s;
   }
   .ss-card { cursor: zoom-in; }
-  .ss-card:hover { transform: scale(1.1); box-shadow: 0 10px 24px rgba(153,110,94,.12); }
+  .ss-card:hover { transform: scale(1.05); box-shadow: 0 10px 24px rgba(153,110,94,.12); }
   .ss-card:focus-visible { outline: 2px solid rgba(153,110,94,.9); outline-offset: 3px; }
 
   /* Lightbox：點卡片放大檢視，內容不再受固定高度限制 */
@@ -521,6 +521,10 @@
     .ss-head { padding: 16px 20px 14px; gap: 10px 12px; }
     .ss-eyebrow { font-size: 13px; }
     .ss-head .aiwf-skillpill, .ss-id .ss-name { font-size: 16px; }
+    /* 手機：頁面上的卡片表頭只留標題文字，收掉 eyebrow 與 pill 省高度；
+       用 .aiwf-skillspec 限定，Lightbox（掛在 body 下）仍保留完整表頭 */
+    .aiwf-skillspec > .ss-card .ss-eyebrow,
+    .aiwf-skillspec > .ss-card .ss-head .aiwf-skillpill { display: none; }
     .ss-col { padding-left: 20px; padding-right: 20px; }
     .ss-floor { padding: 12px 20px 14px; }
     .ss-chips em { font-size: 13px; padding: 2px 8px; }
