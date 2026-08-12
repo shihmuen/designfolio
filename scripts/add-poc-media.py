@@ -9,6 +9,7 @@
 #       進出視窗自動 play／pause；點擊開 Lightbox 放大檢視並帶控制列，
 #       播放位置在 inline 與 Lightbox 之間互相接續。
 # 寬度比照情境2／3 的規範卡（滿版 1152）。
+# 重跑前先 git checkout 48dd646 -- <該 html> 還原（該 commit 已含最新 Background／Purpose 文案）。
 import pathlib
 
 P = pathlib.Path('/Users/shihmuen/Desktop/portfolio-site/dist/zh/my-ai-workflow/index.html')
