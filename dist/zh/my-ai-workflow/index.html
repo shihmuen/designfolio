@@ -253,6 +253,13 @@
     aspect-ratio: 824 / 424; background: #DCCCC7; border-radius: 8px;
   }
 
+  /* 情境1 POC 操作 GIF：寬度比照規範卡，滿版對齊 */
+  .aiwf-media {
+    width: 100%; border-radius: 16px; overflow: hidden;
+    border: 1px solid rgba(0,0,0,.1); background: #DCCCC7; line-height: 0;
+  }
+  .aiwf-media img { width: 100%; height: auto; display: block; }
+
   /* 自定義 Skill 內容規範卡（情境2／3）：滿版寬度、固定高度、內容垂直排列可捲動 */
   .aiwf-skillspec { width: 100%; }
   .ss-card {
@@ -662,7 +669,11 @@
         <h2 class="sc-title"><span class="hand">POC：</span>幫助團隊溝通、對齊目標，避免靠想像力開會</h2>
         <p class="sc-intro">我沒有 coding 相關背景。過去要對齊一個功能想法，只能用靜態的 wireframe、lo-fi 的 prototype 再加上口頭描述。即便仔細來回對齊所有 Stakeholders 的需求，但還是出現不少次精緻稿 mockup 完成時再砍掉重來的情況。</p>
       </div>
-      <div class="aiwf-figure"><div class="ph" data-slot="poc-demo"><!-- 素材待補：POC Demo --></div></div>
+      <div class="aiwf-media">
+        <img src="/_assets/custom/aiwf/poc-demo.gif" width="960" height="547"
+             loading="lazy" decoding="async"
+             alt="Seller 2FA POC 操作錄影：註冊、招商申請、審核、兩步驟驗證、邀請成員與權限設定">
+      </div>
       <div class="aiwf-specs">
         <div class="row"><span class="k">Product</span><span class="bar"></span><span class="v">電商供應商後台</span></div>
         <div class="row"><span class="k">Background</span><span class="bar"></span><span class="v">因應後台登入機制的修改，調整 註冊登入、開店上架 Onboarding 流程設計，並導入兩步驗證 (2FA) 強化後台安全。</span></div>
@@ -1133,7 +1144,7 @@
       '.aiwf-conclusion .aiwf-label', '.aiwf-hand',
       '.aiwf-daily .aiwf-label', '.aiwf-daily-title', '.aiwf-blocks li', '.aiwf-claude',
       '.aiwf-transition .wrap',
-      '.sc-head', '.aiwf-figure', '.aiwf-skillspec', '.aiwf-specs .row', '.aiwf-prompts .bubble',
+      '.sc-head', '.aiwf-figure', '.aiwf-media', '.aiwf-skillspec', '.aiwf-specs .row', '.aiwf-prompts .bubble',
       '.aiwf-insight .in-text', '.aiwf-qa',
       '.aiwf-next a'];
     var targets = document.querySelectorAll(SEL.join(','));
