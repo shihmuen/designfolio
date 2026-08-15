@@ -39,6 +39,13 @@ createServer(async (req, res) => {
     return;
   }
   const body = await readFile(file);
-  res.writeHead(200, { 'content-type': MIME[path.extname(file)] || 'application/octet-stream' });
+  // ⚠️ 一定要送 no-store：本來完全沒有快取標頭，Safari 會自己啟發式快取，
+  //    改了程式碼卻看到舊版，會讓「修好了沒」的判斷全部失準。
+  res.writeHead(200, {
+    'content-type': MIME[path.extname(file)] || 'application/octet-stream',
+    'cache-control': 'no-store, no-cache, must-revalidate, max-age=0',
+    'pragma': 'no-cache',
+    'expires': '0',
+  });
   res.end(body);
 }).listen(PORT, () => console.log(`dev server on http://localhost:${PORT} (root: ${ROOT})`));
