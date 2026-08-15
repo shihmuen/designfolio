@@ -17,6 +17,18 @@ else
   fi
 fi
 
+# Hero 的 Playlist widget 本機版（port 4180）
+PLAYLIST_DIR="$HOME/Desktop/☁️/moon-agent/my-playlist/site"
+if lsof -i :4180 -sTCP:LISTEN >/dev/null 2>&1; then
+  echo "Playlist 本機伺服器已在跑。"
+elif [ -d "$PLAYLIST_DIR" ]; then
+  echo "啟動 Playlist 本機伺服器（port 4180）…"
+  nohup python3 -m http.server 4180 --directory "$PLAYLIST_DIR" >/tmp/portfolio-playlist.log 2>&1 &
+  sleep 1
+else
+  echo "⚠️ 找不到 playlist 資料夾，Hero 的唱片會是空白框。"
+fi
+
 open "http://localhost:4173"
 echo ""
 echo "✅ 本機預覽：http://localhost:4173"
