@@ -2,21 +2,41 @@
 // 做法：clone 首頁的 Selected Works 區塊 → 標題改 AI Workflow、只留一張卡並改寫成
 // 「設計我的 AI 協作系統」[2026]、移除 VIEW ALL 按鈕 → 插到原區塊前面。
 // 用法：node scripts/patch-home-aiwf.mjs（可重複執行，會替換舊版）
-// 目前只套用中文版（dist/zh/index.html）；英文版待 Molly 確認後另加。
+// 2026-08-16：原本只套中文版，英文版首頁因此完全沒有這個區塊（Molly 回報）。
+// 現在 zh + en 都注入，文案與比對錨點由 runtime 依 data-molly-lang 決定（見 COPY）。
 import { readFile, writeFile } from 'node:fs/promises';
 
-// 注入所有 zh 頁面：站內換頁是 SPA（不重載 HTML），監聽器必須從任何入口頁就開始跑
+// 注入所有頁面：站內換頁是 SPA（不重載 HTML），監聽器必須從任何入口頁就開始跑
 const PAGES = ['', 'nav', 'about-me', 'works', 'pomo-ecosystem', 'nfc-claming', 'clovis-mvp', 'token-generate-event', 'memory-gallery'];
-const FILES = PAGES.map((p) => new URL(`../dist/zh/${p ? p + '/' : ''}index.html`, import.meta.url).pathname);
+const FILES = [];
+for (const lang of ['zh', 'en']) {
+  for (const p of PAGES) FILES.push(new URL(`../dist/${lang}/${p ? p + '/' : ''}index.html`, import.meta.url).pathname);
+}
 const MARKER = 'molly-home-aiwf-patch';
 
 const SNIPPET = `<script id="${MARKER}">
 (function () {
   var SECTION_ID = 'molly-aiwf-section';
+  var LANG = document.documentElement.getAttribute('data-molly-lang') === 'en' ? 'en' : 'zh';
+  // 英文標題與描述沿用 /en/my-ai-workflow 頁上已有的官方版本，不另外翻譯
+  var COPY = {
+    zh: {
+      title: '設計我的 AI 協作系統',
+      desc: '沒有 coding 背景的我，用 UX 方法把 Claude 設計成協作系統——幫我打造 POC 對齊團隊、把討論轉成開發文件、依驗收標準執行設計稿。',
+      cardTitle: 'POMO 生態系統',      // 要被取代的原卡標題開頭
+      quote: '對我來說'                 // 設計哲學金句開頭（不屬於這個區塊，要移除）
+    },
+    en: {
+      title: 'Designing My AI Collaboration System',
+      desc: 'Without a coding background, I used UX methods to turn Claude into a collaboration system \u2014 building POCs to align the team, turning discussions into dev docs, and executing design files to my acceptance standards.',
+      cardTitle: 'POMO Ecosystem',
+      quote: 'For me, design is'
+    }
+  };
   var NEW = {
-    heading: 'AI Workflow',
-    title: '設計我的 AI 協作系統',
-    desc: '沒有 coding 背景的我，用 UX 方法把 Claude 設計成協作系統——幫我打造 POC 對齊團隊、把討論轉成開發文件、依驗收標準執行設計稿。',
+    heading: 'AI Workflow',            // 區塊標題兩版都是英文
+    title: COPY[LANG].title,
+    desc: COPY[LANG].desc,
     img: '/_assets/custom/ai-collab-cover.jpg'
   };
   var TAG_MAP = { 'Product Design': 'Claude', 'B2B Backend System': 'AI Workflow', 'B2C Frontend Interface': 'UX for AI' };
@@ -70,7 +90,7 @@ const SNIPPET = `<script id="${MARKER}">
     while ((n = walker.nextNode())) {
       var s = n.nodeValue.trim();
       if (/^\\[20\\d\\d\\]$/.test(s)) n.nodeValue = '[2026]';
-      else if (s.indexOf('POMO 生態系統') === 0) n.nodeValue = NEW.title;
+      else if (s.indexOf(COPY[LANG].cardTitle) === 0) n.nodeValue = NEW.title;
       else if (s.indexOf('POMO Network') === 0) n.nodeValue = NEW.desc;
       else if (TAG_MAP[s]) n.nodeValue = TAG_MAP[s];
       else if (s.indexOf('image generate') !== -1) n.nodeValue = '';
@@ -145,7 +165,7 @@ const SNIPPET = `<script id="${MARKER}">
     var els2 = clone.querySelectorAll('*');
     for (var q = els2.length - 1; q >= 0; q--) {
       var qt = txt(els2[q]);
-      if (qt.indexOf('對我來說') === 0) {
+      if (qt.indexOf(COPY[LANG].quote) === 0) {
         var qbox = els2[q];
         while (qbox.parentElement && qbox.parentElement !== clone && txt(qbox.parentElement) === qt) qbox = qbox.parentElement;
         qbox.parentNode && qbox.parentNode.removeChild(qbox);
@@ -226,7 +246,7 @@ const SNIPPET = `<script id="${MARKER}">
   function mount() {
     // 補丁注入在所有頁面（SPA 換頁不會重新執行各頁的 script），
     // 只在首頁網址下動作
-    if (!/^\\/(zh\\/?)?$/.test(location.pathname)) return;
+    if (!/^\\/((zh|en)\\/?)?$/.test(location.pathname)) return;
     if (document.getElementById(SECTION_ID)) return;
     var parts = findParts();
     if (!parts) return;
@@ -286,4 +306,4 @@ for (const file of FILES) {
   }
   await writeFile(file, html);
 }
-console.log(`home AI Workflow patch applied to ${FILES.length} zh pages`);
+console.log(`home AI Workflow patch applied to ${FILES.length} pages (zh + en)`);
