@@ -37,15 +37,17 @@ const DESC = {
     from: [
       '嗨，我是 Molly，現居台北。我在新創公司累積了超過 5 年的設計經驗，習慣直指用戶需求的核心，跨團隊協作尋找最適合的解決方案，並在快速變動的環境中全力投入設計。這些年的歷練與探索讓我越來越清楚一件事：我希望有一天能打造一個真正屬於我的產品 —— 一個能真正解決問題、同時帶有情感厚度的產品。',
       '現居台北，做了五年產品設計。以前我的創意只能停在設計稿上，等人來實現；現在我可以自己動手，把它做成可以點、可以用、真的存在的東西。這件事改變了我看設計的方式 —— 我想做的不只是好看的介面，而是一個真正解決問題、又帶著溫度的產品。'
+      ,'現居台北，做產品設計 5+ 年。以前我的創意只能停在設計稿上，等人來實現；現在我可以自己動手，把它做成可以點、可以用、真的存在，能與人有連結的東西。'
     ],
-    to: '現居台北，做產品設計 5+ 年。以前我的創意只能停在設計稿上，等人來實現；現在我可以自己動手，把它做成可以點、可以用、真的存在，能與人有連結的東西。'
+    to: '現居台北，目前有 5+ 年的設計工作經驗。以前我的創意只能停在設計稿上，等人來實現；現在我可以自己動手，把它做成可以點、可以用、真的存在，能與人有連結的東西。'
   },
   en: {
     from: [
       'Hi, I’m Molly, based in Taipei. With over 5 years of design experience in the startup, I’m used to getting to the core of user needs, collaborating across teams to find the most fitting solutions, and bringing my full design energy into fast-moving environments. These years of experience and exploration have made one thing clearer to me: I hope to one day create a product I can fully devote myself to—one that truly solves real problems and carries emotional depth.',
       'Based in Taipei, five years into product design. My ideas used to stop at the mockup, waiting for someone else to build them; now I build them myself — into something you can click, use, and actually hold. That changed how I see design: I don’t just want a beautiful interface, I want a product that solves a real problem and still has warmth to it.'
+      ,'Based in Taipei, 5+ years in product design. My ideas used to stop at the mockup, waiting for someone else to build them; now I build them myself — into something you can click, can use, that actually exists and connects with people.'
     ],
-    to: 'Based in Taipei, 5+ years in product design. My ideas used to stop at the mockup, waiting for someone else to build them; now I build them myself — into something you can click, can use, that actually exists and connects with people.'
+    to: 'Based in Taipei, with 5+ years of design experience. My ideas used to stop at the mockup, waiting for someone else to build them; now I build them myself — into something you can click, can use, that actually exists and connects with people.'
   }
 };
 
