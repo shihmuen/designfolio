@@ -154,26 +154,43 @@
 <script id="molly-ai-card-patch">
 (function () {
   var CARD_ID = 'molly-ai-collab-card';
+  var LANG = document.documentElement.getAttribute('data-molly-lang') === 'en' ? 'en' : 'zh';
+  // 英文標題與描述沿用 /en/my-ai-workflow 頁上已有的官方版本，不另外翻譯
+  var COPY = {
+    zh: {
+      title: '設計我的 AI 協作系統',
+      desc: '沒有 coding 背景的我，用 UX 方法把 Claude 設計成協作系統：幫我打造 POC 對齊團隊、把討論轉成開發文件、依驗收標準執行設計稿。',
+      cardTitle: 'POMO 生態系統',          // 要被取代的原卡標題開頭
+      others: ['[2025]', 'NFC', 'Clovis', '旅行回憶錄']
+    },
+    en: {
+      title: 'Designing My AI Collaboration System',
+      desc: 'Without a coding background, I used UX methods to turn Claude into a collaboration system — building POCs to align the team, turning discussions into dev docs, and executing design files to my acceptance standards.',
+      cardTitle: 'POMO Ecosystem',
+      others: ['[2025]', 'NFC', 'Clovis', 'Memory Gallery']
+    }
+  };
   var NEW = {
-    title: '設計我的 AI 協作系統',
-    desc: '沒有 coding 背景的我，用 UX 方法把 Claude 設計成協作系統：幫我打造 POC 對齊團隊、把討論轉成開發文件、依驗收標準執行設計稿。',
+    title: COPY[LANG].title,
+    desc: COPY[LANG].desc,
     img: '/_assets/custom/ai-collab-cover.jpg'
   };
+  // 中英兩版的 tag 都是英文，對照表共用
   var TAG_MAP = { 'Product Design': 'Claude', 'B2B Backend System': 'AI Workflow', 'B2C Frontend Interface': 'UX for AI' };
 
   // 找「整張 POMO 卡」：先找含 [2024]+POMO 標題的最深容器，
   // 再往上爬到包含 tags 與圖的完整卡片（一碰到其他卡的內容就停）。
   function containsOtherCards(el) {
-    var t = el.textContent || '';
-    return t.indexOf('[2025]') !== -1 || t.indexOf('NFC') !== -1 ||
-           t.indexOf('Clovis') !== -1 || t.indexOf('旅行回憶錄') !== -1;
+    var t = el.textContent || '', o = COPY[LANG].others;
+    for (var i = 0; i < o.length; i++) if (t.indexOf(o[i]) !== -1) return true;
+    return false;
   }
   function findCard() {
     var nodes = document.querySelectorAll('div,section,article,li');
     var best = null;
     for (var i = 0; i < nodes.length; i++) {
       var el = nodes[i], t = el.textContent || '';
-      if (t.indexOf('[2024]') !== -1 && t.indexOf('POMO 生態系統') !== -1 && !containsOtherCards(el)) {
+      if (t.indexOf('[2024]') !== -1 && t.indexOf(COPY[LANG].cardTitle) !== -1 && !containsOtherCards(el)) {
         if (!best || best.contains(el)) best = el; // 越深越準
       }
     }
@@ -195,7 +212,7 @@
     while ((n = walker.nextNode())) {
       var s = n.nodeValue.trim();
       if (s === '[2024]') n.nodeValue = '[2026]';
-      else if (s.indexOf('POMO 生態系統') === 0) n.nodeValue = NEW.title;
+      else if (s.indexOf(COPY[LANG].cardTitle) === 0) n.nodeValue = NEW.title;
       else if (s.indexOf('POMO Network') === 0) n.nodeValue = NEW.desc;
       else if (TAG_MAP[s]) n.nodeValue = TAG_MAP[s];
       else if (s.indexOf('image generate') !== -1) n.nodeValue = ''; // 原卡的 AI 產圖註記不適用
@@ -320,7 +337,7 @@
   function mount() {
     // 補丁注入在所有頁面（SPA 換頁不會重新執行各頁的 script），
     // 只在 Works 頁的網址下動作
-    if (!/^\/(zh\/)?works\/?$/.test(location.pathname)) return;
+    if (!/^\/(zh\/|en\/)?works\/?$/.test(location.pathname)) return;
     if (document.getElementById(CARD_ID)) return;
     var card = findCard();
     if (!card || !card.parentElement) return;

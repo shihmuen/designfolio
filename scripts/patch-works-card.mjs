@@ -5,34 +5,56 @@
 // 封面圖：dist/_assets/custom/ai-collab-cover.jpg（來源 Downloads/設計我的AI協作系統-Cover.png）
 import { readFile, writeFile } from 'node:fs/promises';
 
-// 注入所有 zh 頁面：站內換頁是 SPA（不重載 HTML），監聽器必須從任何入口頁就開始跑
+// 注入所有頁面：站內換頁是 SPA（不重載 HTML），監聽器必須從任何入口頁就開始跑
+// 2026-08-16：原本只注入 zh，英文版 Works 頁因此沒有這張卡（Molly 回報）。改成兩種語言都注入，
+// 文案與比對錨點由 runtime 依 data-molly-lang 決定（見 SNIPPET 裡的 CFG）。
 const PAGES = ['', 'nav', 'about-me', 'works', 'pomo-ecosystem', 'nfc-claming', 'clovis-mvp', 'token-generate-event', 'memory-gallery'];
-const FILES = PAGES.map((p) => new URL(`../dist/zh/${p ? p + '/' : ''}index.html`, import.meta.url).pathname);
+const FILES = [];
+for (const lang of ['zh', 'en']) {
+  for (const p of PAGES) FILES.push(new URL(`../dist/${lang}/${p ? p + '/' : ''}index.html`, import.meta.url).pathname);
+}
 const MARKER = 'molly-ai-card-patch';
 
 const SNIPPET = `<script id="${MARKER}">
 (function () {
   var CARD_ID = 'molly-ai-collab-card';
+  var LANG = document.documentElement.getAttribute('data-molly-lang') === 'en' ? 'en' : 'zh';
+  // 英文標題與描述沿用 /en/my-ai-workflow 頁上已有的官方版本，不另外翻譯
+  var COPY = {
+    zh: {
+      title: '設計我的 AI 協作系統',
+      desc: '沒有 coding 背景的我，用 UX 方法把 Claude 設計成協作系統：幫我打造 POC 對齊團隊、把討論轉成開發文件、依驗收標準執行設計稿。',
+      cardTitle: 'POMO \u751f\u614b\u7cfb\u7d71',          // 要被取代的原卡標題開頭
+      others: ['[2025]', 'NFC', 'Clovis', '\u65c5\u884c\u56de\u61b6\u9304']
+    },
+    en: {
+      title: 'Designing My AI Collaboration System',
+      desc: 'Without a coding background, I used UX methods to turn Claude into a collaboration system \u2014 building POCs to align the team, turning discussions into dev docs, and executing design files to my acceptance standards.',
+      cardTitle: 'POMO Ecosystem',
+      others: ['[2025]', 'NFC', 'Clovis', 'Memory Gallery']
+    }
+  };
   var NEW = {
-    title: '設計我的 AI 協作系統',
-    desc: '沒有 coding 背景的我，用 UX 方法把 Claude 設計成協作系統：幫我打造 POC 對齊團隊、把討論轉成開發文件、依驗收標準執行設計稿。',
+    title: COPY[LANG].title,
+    desc: COPY[LANG].desc,
     img: '/_assets/custom/ai-collab-cover.jpg'
   };
+  // 中英兩版的 tag 都是英文，對照表共用
   var TAG_MAP = { 'Product Design': 'Claude', 'B2B Backend System': 'AI Workflow', 'B2C Frontend Interface': 'UX for AI' };
 
   // 找「整張 POMO 卡」：先找含 [2024]+POMO 標題的最深容器，
   // 再往上爬到包含 tags 與圖的完整卡片（一碰到其他卡的內容就停）。
   function containsOtherCards(el) {
-    var t = el.textContent || '';
-    return t.indexOf('[2025]') !== -1 || t.indexOf('NFC') !== -1 ||
-           t.indexOf('Clovis') !== -1 || t.indexOf('旅行回憶錄') !== -1;
+    var t = el.textContent || '', o = COPY[LANG].others;
+    for (var i = 0; i < o.length; i++) if (t.indexOf(o[i]) !== -1) return true;
+    return false;
   }
   function findCard() {
     var nodes = document.querySelectorAll('div,section,article,li');
     var best = null;
     for (var i = 0; i < nodes.length; i++) {
       var el = nodes[i], t = el.textContent || '';
-      if (t.indexOf('[2024]') !== -1 && t.indexOf('POMO 生態系統') !== -1 && !containsOtherCards(el)) {
+      if (t.indexOf('[2024]') !== -1 && t.indexOf(COPY[LANG].cardTitle) !== -1 && !containsOtherCards(el)) {
         if (!best || best.contains(el)) best = el; // 越深越準
       }
     }
@@ -54,7 +76,7 @@ const SNIPPET = `<script id="${MARKER}">
     while ((n = walker.nextNode())) {
       var s = n.nodeValue.trim();
       if (s === '[2024]') n.nodeValue = '[2026]';
-      else if (s.indexOf('POMO 生態系統') === 0) n.nodeValue = NEW.title;
+      else if (s.indexOf(COPY[LANG].cardTitle) === 0) n.nodeValue = NEW.title;
       else if (s.indexOf('POMO Network') === 0) n.nodeValue = NEW.desc;
       else if (TAG_MAP[s]) n.nodeValue = TAG_MAP[s];
       else if (s.indexOf('image generate') !== -1) n.nodeValue = ''; // 原卡的 AI 產圖註記不適用
@@ -179,7 +201,7 @@ const SNIPPET = `<script id="${MARKER}">
   function mount() {
     // 補丁注入在所有頁面（SPA 換頁不會重新執行各頁的 script），
     // 只在 Works 頁的網址下動作
-    if (!/^\\/(zh\\/)?works\\/?$/.test(location.pathname)) return;
+    if (!/^\\/(zh\\/|en\\/)?works\\/?$/.test(location.pathname)) return;
     if (document.getElementById(CARD_ID)) return;
     var card = findCard();
     if (!card || !card.parentElement) return;
@@ -243,4 +265,4 @@ for (const file of FILES) {
   }
   await writeFile(file, html);
 }
-console.log(`AI-collab card patch applied to ${FILES.length} zh pages`);
+console.log(`AI-collab card patch applied to ${FILES.length} pages (zh + en)`);
