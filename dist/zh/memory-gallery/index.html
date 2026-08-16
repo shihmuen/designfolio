@@ -870,7 +870,7 @@
   else boot();
 })();
 </script>
-<script id="molly-hero-v4-desc">window.__MH4_DESC="現居台北，做了五年產品設計。以前我的創意只能停在設計稿上，等人來實現；現在我可以自己動手，把它做成可以點、可以用、真的存在的東西。這件事改變了我看設計的方式 —— 我想做的不只是好看的介面，而是一個真正解決問題、又帶著溫度的產品。";</script>
+<script id="molly-hero-v4-desc">window.__MH4_DESC="現居台北，做產品設計 5+ 年。以前我的創意只能停在設計稿上，等人來實現；現在我可以自己動手，把它做成可以點、可以用、真的存在，能與人有連結的東西。";</script>
 <script id="molly-hero-v4">
 (function () {
   var LANG = document.documentElement.getAttribute('data-molly-lang') || 'zh';
@@ -888,13 +888,41 @@
   //   但這裡設的是「盒子的 margin」，比墨帶間距小（差的是行高的上下留白）。
   //   桌機的 36/41/150 是 Molly 已核可的手感，反推差值＝ 12 / 14 / 3，
   //   平板與手機套用同一組差值，桌機因此完全不動。
-  var GAPS = [{ bp: 1024, l2: 36, l3: 41, desc: 150 },   // 🔒 已定案，勿動
-              { bp: 600,  l2: 43, l3: 39, desc: 150 },
-              { bp: 0,    l2: 12, l3: 12, desc: 43  }];
+  // top／about 是 2026-08-16 對照 792:622 補的兩段「區塊間距」，量法跟上面不同：
+  // 不是墨帶，而是直接抄設計稿的絕對座標（Figma 讀出來的 absoluteBoundingBox，
+  // 以 Hero frame 頂端＝header 下緣為 0）：
+  //   top   ＝手寫 M 的上緣      桌機 80 ｜平板 80 ｜手機 97
+  //   about ＝描述下緣→ABOUT ME 上緣  桌機 60 ｜平板 60 ｜手機 24
+  // 這兩個都用「先歸零、量出現況、再補差值」的做法，站台自己的 padding 改了也會跟上。
+  // ── 目前是哪一個 breakpoint ──
+  // 站台自己把答案寫在 [data-breakpoint] 的 data-width（375 / 800 / 1280）。
+  // ⚠️ 底下所有對照表都必須用它查，**不要用 viewport 寬去猜切換點**：
+  //    站台不是在 600/1024 切版，實測 768 還是 375 版 —— 用猜的會有一整段寬度
+  //    （600–767）全部套錯（Molly 回報「手機版 ABOUT ME 按鈕過大」就是這個）。
+  function bpWidth() {
+    var el = document.querySelector('[data-breakpoint][data-width]');
+    var w = el && parseInt(el.getAttribute('data-width'), 10);
+    return (w > 0) ? w : document.documentElement.clientWidth;
+  }
+
+  // padBottom ＝ 設計稿 Hero frame 自己的 paddingBottom（Playlist 區的 20/20/60 之外）
+  var GAPS = [{ bp: 1024, l2: 36, l3: 41, desc: 150, top: 80, about: 60, padBottom: 60 },   // 🔒 l2/l3/desc 已定案，勿動
+              { bp: 600,  l2: 35, l3: 39, desc: 150, top: 80, about: 60, padBottom: 60 },   // Molly 08-16：-8
+              { bp: 0,    l2: 12, l3: 16, desc: 43,  top: 97, about: 24, padBottom: 40 }];  // Molly 08-16：手機 L3 換行處 +4（12→16 讓行高 43→47）
   function gapSpec() {
-    var vw = document.documentElement.clientWidth;
+    var vw = bpWidth();
     for (var i = 0; i < GAPS.length; i++) if (vw >= GAPS[i].bp) return GAPS[i];
     return GAPS[GAPS.length - 1];
+  }
+  // 描述段的字級／行高（設計稿 792:622 讀出來的：22/150%、20/150%、14/140%）。
+  // 站台原生是 20/18/18，手機那格差最多（18→14）。Molly 08-16 核可對齊設計稿。
+  var DESCT = [{ bp: 1024, fs: 22, lh: 33 },
+               { bp: 600,  fs: 18, lh: 27 },     // Molly 08-16：平板改 18（設計稿是 20）
+               { bp: 0,    fs: 14, lh: 19.6 }];
+  function descSpec() {
+    var vw = bpWidth();
+    for (var i = 0; i < DESCT.length; i++) if (vw >= DESCT[i].bp) return DESCT[i];
+    return DESCT[DESCT.length - 1];
   }
   // ── 播放器尺寸：完全不縮放 ──
   // ⚠️ 這裡刻意不做任何 transform:scale()。之前試過兩種縮法都出事：
@@ -908,11 +936,12 @@
   //   1280 → 354 ≈ 360（Molly 已定案，維持 360）、右對齊
   //    800 → 316、右對齊
   //    375 → 235、置中
+  // 設計稿 792:622 的 Image instance 實際尺寸（use_figma 讀出來的，不是像素量的）
   var SIZES = [{ bp: 1024, card: 360, align: 'right' },
-               { bp: 600,  card: 316, align: 'right' },
-               { bp: 0,    card: 235, align: 'center' }];
+               { bp: 600,  card: 320, align: 'right' },
+               { bp: 0,    card: 240, align: 'center' }];
   function sizeFor() {
-    var vw = document.documentElement.clientWidth;
+    var vw = bpWidth();
     for (var i = 0; i < SIZES.length; i++) if (vw >= SIZES[i].bp) return SIZES[i];
     return SIZES[SIZES.length - 1];
   }
@@ -921,12 +950,25 @@
   var CFG = LANG === 'en' ? {
     hi: "Hi, I'm ", a: 'a ',
     modes: {
-      WORK: { intro: "|can't-code|", word: '|POC-shipping|', role: ' product designer',
+      // 英文的語序跟中文相反：中文可以把子句掛在名詞前面（「不會寫 code 的產品設計師」），
+      // 英文不行 —— 硬壓成連字號形容詞會壞掉（a can't-code product designer 不成立）。
+      // 所以英文版把變數移到名詞後面，用 who 接。組裝順序見 buildTitle()。
+      // ⚠️ 英文兩句的長度必須相近，否則鎖寬的槽位會讓大括號離文字很遠（中文兩句
+      //    長度接近所以看不出來）。另外槽位上限是 571px（容器 1152 減掉
+      //    product designer / who / 大括號）。實測後的配對：
+      //      can't write code 338 ／ speaks in POCs 334（差 4）
+      //      left every idea in Figma 488 ／ builds them myself now 505（差 17）
+      //    speaks in POCs 也剛好是「用 POC 說話」最直譯的講法。
+      WORK: { intro: "can't write |code|", word: 'speaks in |POC|s',
+              role: 'product designer who',
               label: 'slide to build something FUN', theme: 'light' },
-      FUN:  { intro: '|Figma-only|',  word: '|hands-on|',     role: ' product builder',
+      FUN:  { intro: 'left every idea in |Figma|',    word: 'builds them |myself| now',
+              role: 'product builder who',
               label: 'slide to get back to WORK', theme: 'dark' }
     },
-    descHead: 'Based in Taipei, five years into product design.'
+    // ⚠️ 只當「哪個 <p> 是描述」的指紋用，所以要短到改文案也不會失效。
+    // 之前寫整句開頭，DESC 一改就抓不到 <p>，描述的字級／間距／maxWidth 全部不會套。
+    descHead: 'Based in Taipei'
   } : {
     hi: '嗨，我是 ', a: '一個 ',
     modes: {
@@ -935,7 +977,7 @@
       FUN:  { intro: '只停留在 |Figma|', word: '自己動手實現創意', role: ' 的產品建造者',
               label: '滑回去，繼續工作', theme: 'dark' }
     },
-    descHead: '現居台北，做了五年產品設計。'
+    descHead: '現居台北'
   };
 
   // Switch 皮膚：WORK 淺米色軌道＋黑咖啡在左，FUN 深咖啡軌道＋拿鐵在右
@@ -1021,7 +1063,12 @@
     } else {
       slot.style.width = fixed + 'px';
     }
-    slot.style.height = word.offsetHeight + 'px';
+    // ⚠️ 槽高若剛好等於行高，下伸筆畫會被 overflow:hidden 削掉（實測 designer 的 g
+    //    墨底在 49.7、槽高 49 → 差 0.7px 就讓 g 看起來像 a）。多留 4px，
+    //    再用等量的負 margin 把基線拉回原位（槽位是 vertical-align:bottom，
+    //    單純加高會讓整段往上跑，跟 who 與大括號錯開）。
+    slot.style.height = (word.offsetHeight + 4) + 'px';
+    slot.style.marginBottom = '-4px';
     if (!animate) { void slot.offsetWidth; slot.style.transition = 'width .3s ' + EASE; }
   }
   function roll(slot, word, html, onIn) {
@@ -1077,7 +1124,7 @@
                { bp: 600,  size: 37.5, center: true },
                { bp: 0,    size: 31,   center: false }];  // 手機版設計稿是靠左，不置中
   function titleSpec() {
-    var vw = document.documentElement.clientWidth;
+    var vw = bpWidth();
     for (var i = 0; i < TFONT.length; i++) if (vw >= TFONT[i].bp) return TFONT[i];
     return TFONT[TFONT.length - 1];
   }
@@ -1195,14 +1242,136 @@
     var l2 = byId('mh4-line2'), l3 = document.querySelector('[data-mh4-line3]');
     var dw = document.querySelector('[data-mh4-descwrap]');
     if (!l3) return;
-    if (l2) l2.style.margin = g.l2 + 'px 0 0';
-    l3.style.marginTop = g.l3 + 'px';
+    // ⚠️ 英文的第三行比中文長（子句改放在名詞後面），而標題區塊的內容盒只有 952
+    //    —— 因為它的父層有 padding-right:200px（左 0 右 200，不對稱）。四句都會折行。
+    //    只有桌機需要處理（平板／手機本來就折行）；描述文雖然共用同一個容器，
+    //    但它自己有 max-width:749，放寬右側 padding 不會動到它。
+    if (LANG === 'en' && l3.parentElement && l3.parentElement.parentElement) {
+      var blk = l3.parentElement.parentElement, pad = blk.parentElement;
+      if (pad) {
+        var wide = bpWidth() >= 1024;
+        if (wide) {
+          if (!pad.hasAttribute('data-mh4-pr'))
+            pad.setAttribute('data-mh4-pr', getComputedStyle(pad).paddingRight);
+          pad.style.paddingRight = '0px';
+        } else if (pad.hasAttribute('data-mh4-pr')) {
+          pad.style.paddingRight = pad.getAttribute('data-mh4-pr');
+        }
+      }
+    }
+    // 設計稿裡標題每一行都是獨立 frame、gap 一致（桌機/平板 32、手機 12），
+    // 所以「換行產生的那一行」也該是同一個間距。瀏覽器的換行只吃 line-height，
+    // 因此把不足的部分補進行高，再從元素之間的 margin 扣掉同樣的量 ——
+    // 元素之間的視覺間距完全不變（已核可的值不動），只有換行處變寬。
+    var f3 = parseFloat(getComputedStyle(l3).fontSize) || 48;
+    var baseLH = f3 * 1.3;
+    var extra = Math.max(0, g.l3 - (baseLH - f3));
+    var lh = Math.round(baseLH + extra);
+    var cur = q('h2', 'olly Shih');
+    var grp = cur && cur.parentElement && cur.parentElement.parentElement;
+    var row1 = grp && grp.getAttribute('data-mh4-namegrp') ? grp.parentElement : grp;
+    [row1, l2, l3].forEach(function (el) { if (el) el.style.lineHeight = lh + 'px'; });
+    if (l2) l2.style.margin = Math.max(0, Math.round(g.l2 - extra)) + 'px 0 0';
+    l3.style.marginTop = Math.max(0, Math.round(g.l3 - extra)) + 'px';
+    // ⚠️ 兩個槽位一定要在這裡（行高剛設完）重新量一次。
+    //    refit() 的順序是 fit() → spaceTitle()，所以 fit() 當下量到的還是站台原生行高
+    //    （例：桌機 68），槽高被釘成 72；等這裡把行高拉到 90，槽位卻沒跟上 ——
+    //    槽位是 overflow:hidden ＋ vertical-align:bottom，太矮會有兩個症狀：
+    //      ① 字被往下擠（Molly 回報「{ 不會寫 code }」與「的產品設計師」沒對齊）
+    //      ② 下伸筆畫被切掉（英文版 product designer 的 g 被切）
+    //    「{ 變數 }」那格看起來沒事，是因為它每 1.5 秒換字時 roll() 會再 fit 一次自己
+    //    補了回來；身分那格只在切換模式時才 fit，所以一直是壞的。
+    fit(byId('mh4-slot'), byId('mh4-word'), false);
+    fit(byId('mh4-roleslot'), byId('mh4-role'), false);
+    // ── 咖啡杯 Switch 上下要等距 ──
+    // 設計稿三行是同一個 auto-layout gap（桌機/平板 32、手機 12），上下必然相等。
+    // 但 L2 的內容是「藥丸」不是文字：藥丸比文字行盒矮，又是垂直置中，
+    // 所以用「墨帶間距 − 行高留白」推算出來的 margin 對 L2 不成立 ——
+    // 實測桌機是上 10 下 26、平板上 7 下 18，Molly 回報「間距不一」就是這個。
+    // 做法：量出目前上下兩段，把差的一半從下面搬到上面。
+    // ⚠️ 只搬不加總：l2 加多少、l3 就減多少，所以 l3 底緣不動，
+    //    描述／ABOUT ME／卡片的位置完全不受影響（那段節奏是 Molly 核可過的）。
+    if (l2 && row1) {
+      var halfLead = (lh - f3 * 1.4) / 2;      // 設計稿是 140% 行高，多出來的一半在字上面
+      var l2r = l2.getBoundingClientRect();
+      var above = l2r.top - row1.getBoundingClientRect().bottom;
+      var below = (l3.getBoundingClientRect().top + halfLead) - l2r.bottom;
+      var shift = Math.round((below - above) / 2);
+      if (shift) {
+        l2.style.marginTop = ((parseFloat(l2.style.marginTop) || 0) + shift) + 'px';
+        l3.style.marginTop = Math.max(0, (parseFloat(l3.style.marginTop) || 0) - shift) + 'px';
+      }
+    }
+    // ── 區塊上留白：header 下緣 → 手寫 M 的上緣 ──
+    // 設計稿 792:622 的 Hero frame 頂端就是 header 下緣，M 的絕對 y ＝ 80/80/97。
+    // 站台原本只有 40/32/80，整個 Hero 比設計稿高一截（Molly 08-16 回報「間距」）。
+    // 錨點用手寫 M 而不是文字行：它是同一張圖，兩邊都量得到、不受行高與字型差異影響。
+    // ⚠️ header 捲動後會從 114 縮成 88，所以量的是 section 的上緣（不會變），不是 header。
+    var mImg = grp && grp.querySelector && grp.querySelector('img');
+    var sec = row1 && row1.closest && row1.closest('section');
+    if (row1 && mImg && sec && g.top != null) {
+      row1.style.marginTop = '0px';
+      var htop = mImg.getBoundingClientRect().top - sec.getBoundingClientRect().top;
+      row1.style.marginTop = Math.max(0, Math.round(g.top - htop)) + 'px';
+    }
+    // ── 描述段：字級／行高／欄寬對齊設計稿 ──
+    if (dw) {
+      var ds = descSpec();
+      var dp = dw.querySelector('p') || dw;
+      dp.style.fontSize = ds.fs + 'px';
+      dp.style.lineHeight = ds.lh + 'px';
+      // 平板的容器多了 padding-right:40（桌機是 200、手機是 0），描述只剩 696。
+      // 設計稿的側邊距是 32，兩側對稱 → 應該是 736。清掉右側 padding 讓它撐滿；
+      // 描述自己有 max-width:749 擋著，不會超過設計稿的欄寬。
+      // ⚠️ 原值要存起來，切回其他 breakpoint 要還回去（跟上面英文版的做法一致）。
+      // ⚠️ 這個容器跟標題共用（英文版上面那段也在改它的 padding-right）。
+      //    所以不要「存舊值再寫回去」——會把英文版剛設的 0px 存成原值。
+      //    只在平板寫 inline，離開平板就把 inline 拿掉讓 CSS 自己接回；
+      //    英文版桌機那格由上面那段負責，這裡不碰。
+      var dpad = dw.parentElement;
+      var vwx = bpWidth();
+      var mid = vwx >= 600 && vwx < 1024;
+      if (dpad) {
+        if (mid) { dpad.setAttribute('data-mh4-dpr', '1'); dpad.style.paddingRight = '0px'; }
+        else if (dpad.hasAttribute('data-mh4-dpr')) {
+          dpad.removeAttribute('data-mh4-dpr');
+          if (!(LANG === 'en' && vwx >= 1024)) dpad.style.paddingRight = '';
+        }
+      }
+    }
+    // ── ABOUT ME 按鈕盒：設計稿桌機／平板都是 200x70（pad 24/32、icon 20）──
+    // 站台平板給的是 pad 18/20＋icon 18 → 174x58；手機的 148x46 本來就對，不要動。
+    // ⚠️ 判斷版型**不能用 viewport 寬**。我原本寫 clientWidth >= 600，但站台自己是
+    //    768 才切版：600–767 這一段站台已經是手機版、我的判斷卻還當成平板，
+    //    手機的按鈕被塞進桌機的 padding → 148x46 變成 200x70（Molly 回報「按鈕過大」）。
+    //    改用 bpWidth()（讀站台自己寫的 data-width），跟著站台真正的 breakpoint 走。
+    var amb = aboutMeBtn();
+    if (amb) {
+      var mobile = bpWidth() < 600;
+      var ic = amb.querySelector('img,svg');
+      amb.style.padding = mobile ? '' : '24px 32px';
+      if (ic) {
+        ic.style.width = mobile ? '' : '20px';
+        ic.style.height = mobile ? '' : '20px';
+      }
+    }
     if (dw) {
       // 描述本來就跟標題隔了一段（容器自己的間距），先歸零量出來再補差，
       // 直接設 153 會變成 153 ＋ 原本那段
       dw.style.marginTop = '0px';
       var have = dw.getBoundingClientRect().top - l3.getBoundingClientRect().bottom;
       dw.style.marginTop = Math.max(0, Math.round(g.desc - have)) + 'px';
+
+      // ── 描述下緣 → ABOUT ME 上緣：設計稿 60/60/24，站台是 60/33/33 ──
+      // 桌機本來就對，平板差 27、手機多 9；一樣先歸零再補差。
+      // 卡片是釘在 ABOUT ME 下緣的（placeWidget），所以它會自己跟著走，不用另外處理。
+      // 這裡允許負值：手機要往上收 9px。
+      var am = aboutMeBtn();
+      if (am && g.about != null) {
+        am.style.marginTop = '0px';
+        var hav2 = am.getBoundingClientRect().top - dw.getBoundingClientRect().bottom;
+        am.style.marginTop = Math.round(g.about - hav2) + 'px';
+      }
     }
   }
 
@@ -1483,9 +1652,152 @@
     return d;
   }
 
+  // ── AI Workflow 卡片與 Selected Works 之間的間距 ──
+  // 設計稿（792:73 / 792:274 / 792:475）把「AI Workflow」與「Selected Works」放在**同一個**
+  // 容器裡，中間只有 Card 6 自己的 padding-bottom ＋ 容器的 gap：
+  //   桌機 180+60=240 ｜ 平板 120+48=168 ｜ 手機 60+48=108（卡片內容底 → 標題頂）
+  // 線上是兩個獨立的 <ul>，中間多了「上一段的 padding-bottom ＋ 下一段的 padding-top」，
+  // 實測 320 / 366 / 280 —— 手機差最多（Molly 回報「間距過大」）。
+  var SECGAP = [{ bp: 1024, v: 240 }, { bp: 600, v: 168 }, { bp: 0, v: 108 }];
+  function secGapWant() {
+    var vw = bpWidth();
+    for (var i = 0; i < SECGAP.length; i++) if (vw >= SECGAP[i].bp) return SECGAP[i].v;
+    return SECGAP[SECGAP.length - 1].v;
+  }
+  // ⚠️ 一律用 offsetTop 鏈算位置，不要用 getBoundingClientRect：
+  //    Figma Sites 的捲動進場動畫會給區塊掛 translateY(140px)，還沒播完就量會整個偏掉
+  //    （量到的間距會憑空少 140）。offsetTop 不吃 transform。
+  function absTop(el) { var y = 0; while (el) { y += el.offsetTop; el = el.offsetParent; } return y; }
+  function sectionPair() {
+    var hs = document.querySelectorAll('h2'), sel = null;
+    for (var i = 0; i < hs.length; i++) {
+      var t = (hs[i].textContent || '').trim();
+      if (t === 'Selected Works' || t === '精選作品') { sel = hs[i]; break; }
+    }
+    if (!sel) return null;
+    var selUL = sel;
+    while (selUL && selUL.tagName !== 'UL') selUL = selUL.parentElement;
+    if (!selUL) return null;
+    var aiUL = selUL.previousElementSibling;
+    if (!aiUL || aiUL.tagName !== 'UL') return null;
+    // ⚠️ 一定要確認前一段真的是「AI Workflow」那一區。**英文版首頁根本沒有這個區塊**
+    //    （root 只有 header / hero / Selected Works / Services / footer），
+    //    少了這道檢查就會把 hero section 當成上一段、去清它的 padding-bottom，
+    //    跟 placeWidget() 互相打架。
+    if (!/AI Workflow/.test(aiUL.textContent || '')) return null;
+    return { sel: sel, selUL: selUL, aiUL: aiUL };
+  }
+  function fixSectionGap() {
+    var pair = sectionPair();
+    if (!pair) return;
+    // 上一段的 padding-bottom 交給下一段的 padding-top 統一控制，才只有一個變因
+    if (pair.aiUL.style.paddingBottom !== '0px') pair.aiUL.style.paddingBottom = '0px';
+    // 內容底＝最深的葉節點底緣（不含容器 padding；絕對定位的裝飾層不算）
+    var ink = -Infinity, all = pair.aiUL.querySelectorAll('*');
+    for (var j = 0; j < all.length; j++) {
+      var e = all[j];
+      if (e.children.length || !e.offsetHeight || !e.offsetWidth) continue;
+      var pos = getComputedStyle(e).position;
+      if (pos === 'absolute' || pos === 'fixed') continue;
+      var b = absTop(e) + e.offsetHeight;
+      if (b > ink) ink = b;
+    }
+    if (ink === -Infinity) return;
+    var have = absTop(pair.sel) - ink;
+    // ⚠️ cur 要讀 computed 不能讀 inline：inline 一開始是空的，算出來的 want 若剛好
+    //    夾成 0 就會「等於 cur」而永遠不寫入，CSS 原本的 padding 就一直留著（不會收斂）。
+    var cur = parseFloat(getComputedStyle(pair.selUL).paddingTop) || 0;
+    var want = Math.max(0, Math.round(cur + (secGapWant() - have)));
+    if (Math.abs(want - cur) > 0.5) pair.selUL.style.paddingTop = want + 'px';
+  }
+
+  // ── AI Workflow 卡片的封面圖 ──
+  // 這張卡是 patch-home-aiwf.mjs 從「POMO 生態系」那張卡 clone 出來改的：
+  // 它把「最高的那張大圖」換成 ai-collab-cover.jpg 當封面，其餘大圖（POMO 咖啡廳照
+  // 與它的「* image generate from Gemini」註解層）用 display:none 收掉。
+  // ⚠️ 那個「挑最高」是**當下量出來的**，換 breakpoint 重跑時圖還沒載完／尺寸不同，
+  //    就會挑錯 —— 平板實測是封面被收掉、POMO 照留著（Molly 回報「附圖不見了」，
+  //    我第一版無差別 unhide 又讓 POMO 照跑出來，更糟）。
+  // 這裡不重挑，只是把「應該的狀態」重新釘一次：封面一定看得見、其他大圖一定收掉。
+  var COVER_SRC = 'ai-collab-cover';
+  function enforceCardCover() {
+    var pair = sectionPair();
+    if (!pair) return;
+    var imgs = pair.aiUL.querySelectorAll('img'), cover = null, others = [];
+    for (var i = 0; i < imgs.length; i++) {
+      var im = imgs[i];
+      if (im.hasAttribute('data-molly-cover') ||
+          (im.getAttribute('src') || '').indexOf(COVER_SRC) > -1) { cover = im; continue; }
+      others.push(im);
+    }
+    if (!cover) return;
+    // 封面：把祖先鏈上被寫死的 display:none 清掉
+    var n = cover;
+    for (var k = 0; k < 5 && n && n !== pair.aiUL; k++) {
+      if (n.style && n.style.display === 'none') n.style.display = '';
+      n = n.parentElement;
+    }
+    // 其他大圖收掉（小的是箭頭 icon，不要動；也不能碰到包著封面的容器）
+    for (var j = 0; j < others.length; j++) {
+      var o = others[j];
+      if (o.offsetWidth < 100 && o.offsetHeight < 100) continue;
+      var box = o.parentElement || o;
+      if (box.contains(cover)) box = o;
+      if (box.contains(cover)) continue;
+      if (box.style.display !== 'none') box.style.display = 'none';
+    }
+
+    // ── 卡片比例：照設計稿 Card 6（792:73 / 792:277 / 792:475）──
+    //   桌機 Text 436x461 ｜ Image 716x461      → 比例 716/461
+    //   平板 Text 316x280 ｜ Image 420x280      → 比例 3/2
+    //   手機 Image 375x250（上下堆疊）          → 比例 3/2
+    // 兩個問題要一起修：
+    //  ① 封面盒的比例被 patch-home-aiwf.mjs 寫死 716/461，平板／手機因此上下被裁
+    //     （封面圖是 1260x840 ＝ 剛好 3:2，用 3/2 就完全不裁）
+    //  ② 兩欄的高度是從 POMO 那張卡繼承來的 408px（描述比較長），封面只有 270 —
+    //     圖下面空一大塊、標籤被推到很下面（Molly 回報「破圖」）。設計稿是 280。
+    // ⚠️ 不能改成 height:auto —— 欄內的東西是絕對定位的，會整個塌掉（實測欄高變 0）。
+    //    要給明確數值。
+    var coverBox = cover.parentElement;
+    for (var t = 0; t < 4 && coverBox; t++) {
+      if (coverBox.style && coverBox.style.aspectRatio) break;
+      coverBox = coverBox.parentElement;
+    }
+    if (!coverBox) return;
+    var slot = coverBox.parentElement, row = slot && slot.parentElement;
+    if (!slot || !row) return;
+    var sw = slot.offsetWidth;
+    // ⚠️ 用 bpWidth() 判版型，不能用圖框寬：手機是滿版，寬螢幕下的手機版（例如 700px
+    //    視窗）圖框也會 >= 700，用寬度判會誤判成桌機、套上 716/461 的比例。
+    var wide = bpWidth() >= 1024;
+    var ar = wide ? '716 / 461' : '3 / 2';
+    if (coverBox.style.aspectRatio !== ar) coverBox.style.aspectRatio = ar;
+    // ⚠️ 光靠 aspect-ratio 不夠。這個盒子是 position:absolute ＋ height:auto，
+    //    absolutely-positioned 元素的 aspect-ratio 各家瀏覽器算法不一致 ——
+    //    Chromium 算得出 420x280，Safari 量到的是 420x209（Molly 回報「比例有問題」）。
+    //    自己用寬度除比例算出 px 高度寫死，兩邊就一致了。
+    var ratio = wide ? (716 / 461) : 1.5;
+    var cw = coverBox.offsetWidth;
+    if (cw > 0) {
+      var ch = Math.round(cw / ratio) + 'px';
+      if (coverBox.style.height !== ch) coverBox.style.height = ch;
+    }
+    // 只有平板那個「左文右圖」的版型需要釘兩欄等高：
+    //   桌機（wide）本來就是 461，量到的是整列不是圖框，不要動；
+    //   手機是上下堆疊、圖滿版，也沒有「兩欄等高」這回事。
+    if (!wide && sw < document.documentElement.clientWidth - 8) {
+      var rowH = (wide ? 461 : 280) + 'px';
+      for (var c = 0; c < row.children.length; c++) {
+        if (row.children[c].style.height !== rowH) row.children[c].style.height = rowH;
+      }
+    }
+  }
+
   function apply() {
     if (!onHome()) return;
     setDesc();
+    enforceCardCover();
+    fixSectionGap();
     // ⚠️ 標題只建一次，但「插入播放器」必須每次心跳都能重試：
     //    照片節點常常比標題晚就緒，早期版本在這裡直接 return，
     //    只要那一次沒抓到照片，widget 就永遠不會被補上（實測會整個消失）。
@@ -1562,8 +1874,13 @@
     bold.setAttribute('data-mh4-line3', '1');
     // justify-content:center —— 槽位鎖成「兩句較寬者」之後，較短的那句若靠左
     // 會在右邊留一段空白（例：只停留在 Figma）。置中才看不出槽位比字寬。
-    var slotCSS = 'display:inline-flex;justify-content:center;overflow:hidden;' +
-                  'vertical-align:bottom;position:relative;' +
+    // ⚠️ align-items 一定要寫 flex-start。inline-flex 的預設是 stretch，裡面的
+    //    <span id=mh4-word> 會被拉到跟槽位一樣高 —— 而 fit() 又是用
+    //    word.offsetHeight + 4 回頭去設槽高，形成正回饋：每換一次字（1.5 秒）
+    //    槽位就長高 4px，描述、ABOUT ME、播放器卡片跟著一路往下掉。
+    //    （症狀：頁面放著不動，間距會越看越大。）
+    var slotCSS = 'display:inline-flex;align-items:flex-start;justify-content:center;' +
+                  'overflow:hidden;vertical-align:bottom;position:relative;' +
                   'transition:width .3s ' + EASE + ';white-space:nowrap;';
     var braceCSS = 'font-family:' + ff + ';font-weight:400;white-space:pre;';
     function mkSlot(sid, wid) {
@@ -1575,10 +1892,27 @@
     }
     var bl = document.createElement('span'); bl.textContent = '{ '; bl.style.cssText = braceCSS;
     var br = document.createElement('span'); br.textContent = ' }'; br.style.cssText = braceCSS;
-    bold.appendChild(bl);
-    bold.appendChild(mkSlot('mh4-slot', 'mh4-word'));
-    bold.appendChild(br);
-    bold.appendChild(mkSlot('mh4-roleslot', 'mh4-role'));
+    // 大括號與變數綁成一組：窄螢幕折行時整組一起走，收尾的 } 不會被單獨甩下去
+    var varWrap = document.createElement('span');
+    varWrap.id = 'mh4-varwrap';
+    varWrap.style.cssText = 'display:inline-flex;align-items:baseline;white-space:nowrap;' +
+      'vertical-align:bottom;';
+    varWrap.appendChild(bl);
+    varWrap.appendChild(mkSlot('mh4-slot', 'mh4-word'));
+    varWrap.appendChild(br);
+    if (LANG === 'en') {
+      // product designer who { … }
+      // ⚠️ who 直接寫進身分字串，不要另外開一個 span。三個結構不同的元素
+      //    （overflow:hidden 的槽位／純文字／inline-flex）混在同一行，基線會對不起來
+      //    —— Molly 回報「who 沒對齊、文字被切到」就是這個。減成兩個元素最乾淨。
+      bold.appendChild(mkSlot('mh4-roleslot', 'mh4-role'));
+      bold.appendChild(document.createTextNode(' '));   // 換行時會被瀏覽器收掉
+      bold.appendChild(varWrap);
+    } else {
+      // { 變數 } 的產品設計師
+      bold.appendChild(varWrap);
+      bold.appendChild(mkSlot('mh4-roleslot', 'mh4-role'));
+    }
 
     var basedWrap = based.closest('.textContents') || based;
     basedWrap.style.display = 'none';
@@ -1631,8 +1965,12 @@
   //   桌機 1280 → 卡片 360、k=1｜平板 800 → 316、k=.878｜手機 375 → 235、k=.653
   var K1 = function (n) { return 'calc(' + n + 'px * var(--k))'; };
   var PLAYER_CSS =
+  // Molly 08-16：Playlist 上下各留 20px（手機 60px）。垂直 padding 不影響寬度，
+  // placeWidget() 算左右位置不受影響；卡片上緣會因此比 ABOUT ME 下緣再低 20px，
+  // 那正是「上方留白」要的效果。
   '#mh4-widget{--k:1;display:flex;flex-direction:column;align-items:center;' +
-    'gap:' + K1(22) + ';width:' + K1(360) + ';flex:0 0 auto;}' +
+    'gap:' + K1(22) + ';width:' + K1(360) + ';flex:0 0 auto;padding:20px 0;}' +
+  '@media (max-width:599px){#mh4-widget{padding:60px 0;}}' +
   '#mh4-widget *{box-sizing:border-box;}' +
   '#mh4-widget .mp-card{position:relative;width:' + K1(360) + ';height:' + K1(360) + ';' +
     'border-radius:' + K1(65) + ';z-index:0;' +
@@ -2280,6 +2618,19 @@
       : vw - pageMargin() - CARD;
     w.style.left = Math.round(left - hr.left) + 'px';
     w.style.top  = Math.round(ar.bottom - hr.top) + 'px';
+
+    // ── Hero 區塊要留得下播放器 ──
+    // widget 是 position:absolute（見上面的祖先裁切註解），完全不佔高度，
+    // 所以 Hero section 的高度還停在「原本那張照片」的尺寸。播放器比設計稿的
+    // 純圖高約 150px（多了控制列與連結），平板實測溢出 153px ——
+    // 下一個區塊（Selected Works）直接壓上來（Molly 回報「間距過少」）。
+    // 用 section 的 padding-bottom 補：先歸零量溢出，再補到設計稿的 Hero 下緣留白。
+    var sec = am.closest && am.closest('section');
+    if (sec) {
+      sec.style.paddingBottom = '0px';
+      var over = w.getBoundingClientRect().bottom - sec.getBoundingClientRect().bottom;
+      sec.style.paddingBottom = Math.max(0, Math.round(over + gapSpec().padBottom)) + 'px';
+    }
   }
 
   function refit() {
